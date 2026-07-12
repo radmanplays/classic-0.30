@@ -1,6 +1,6 @@
 music:true
 sound:true
-invertYMouse:false
+invertYMouse:true
 showFrameRate:true
 viewDistance:0
 bobView:true

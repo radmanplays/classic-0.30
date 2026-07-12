@@ -4,7 +4,6 @@ import com.mojang.minecraft.Minecraft;
 import com.mojang.minecraft.gui.Font;
 import com.mojang.minecraft.mob.HumanoidMob;
 import com.mojang.minecraft.renderer.Textures;
-import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 import java.util.List;
 import org.lwjgl.opengl.GL11;
@@ -17,7 +16,6 @@ public class NetworkPlayer extends HumanoidMob {
 	private int yp;
 	private int zp;
 	private transient int texture = -1;
-	public transient BufferedImage newTexture = null;
 	public String name;
 	public String displayName;
 	int tickCount = 0;
@@ -39,7 +37,6 @@ public class NetworkPlayer extends HumanoidMob {
 		this.yRot = var7;
 		this.armor = this.helmet = false;
 		this.renderOffset = 11.0F / 16.0F;
-		(new NetworkPlayerTextureLoader(this)).start();
 		this.allowAlpha = false;
 	}
 
@@ -57,33 +54,7 @@ public class NetworkPlayer extends HumanoidMob {
 
 	public void bindTexture(Textures var1) {
 		this.textures = var1;
-		if(this.newTexture != null) {
-			BufferedImage var2 = this.newTexture;
-			int[] var3 = new int[512];
-			var2.getRGB(32, 0, 32, 16, var3, 0, 32);
-			int var5 = 0;
-
-			boolean var10001;
-			while(true) {
-				if(var5 >= var3.length) {
-					var10001 = false;
-					break;
-				}
-
-				int var4 = var3[var5] >>> 24;
-				if(var4 < 128) {
-					var10001 = true;
-					break;
-				}
-
-				++var5;
-			}
-
-			this.hasHair = var10001;
-			this.texture = var1.loadTexture(this.newTexture);
-			this.newTexture = null;
-		}
-
+		
 		if(this.texture < 0) {
 			GL11.glBindTexture(GL11.GL_TEXTURE_2D, var1.loadTexture("/char.png"));
 		} else {

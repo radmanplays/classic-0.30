@@ -7,6 +7,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 import com.mojang.minecraft.Minecraft;
 import com.mojang.minecraft.User;
+import com.mojang.minecraft.gamemode.CreativeGameMode;
 
 import net.lax1dude.eaglercraft.EagRuntime;
 import net.lax1dude.eaglercraft.EagUtils;
@@ -68,6 +69,35 @@ public class LWJGLEntryPoint {
 		EagRuntime.create();
 
 		Minecraft minecraft = new Minecraft(854, 480, false);
+		
+		Boolean isCreative = false;
+		ServerInfo serverInfo = null;
+		String username = null;
+
+		for (int i = 0; i < args.length; i++) {
+			if (args[i].equalsIgnoreCase("--server") && i + 1 < args.length) {
+				serverInfo = AddressResolver.resolveURI(args[i + 1]);
+			} else if (args[i].equalsIgnoreCase("--username") && i + 1 < args.length) {
+				username = args[i + 1];
+			} else if (args[i].equalsIgnoreCase("--creative")) {
+		        isCreative = true;
+		    }
+		}
+		if(serverInfo != null) {
+			if (username != null) {
+				minecraft.user = new User(username, "");
+				System.out.println("Using username: " + username);
+			}
+	
+			if (serverInfo.ip != null) {
+				minecraft.setServer(serverInfo.ip);
+				System.out.println("Connecting to server " + serverInfo.ip);
+			}
+		}
+		
+		if (isCreative != false || (serverInfo != null && username != null)) {
+			minecraft.gamemode = new CreativeGameMode(minecraft);
+		}
 
 		File[] f = new File("resources").listFiles();
 		

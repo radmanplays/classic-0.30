@@ -73,7 +73,7 @@ import net.lax1dude.eaglercraft.internal.buffer.IntBuffer;
 import net.lax1dude.eaglercraft.internal.vfs2.VFile2;
 
 public final class Minecraft implements Runnable {
-	public GameMode gamemode = new CreativeGameMode(this);
+	public GameMode gamemode = new SurvivalGameMode(this);
 	private boolean fullscreen = false;
 	public int width;
 	public int height;
@@ -101,8 +101,8 @@ public final class Minecraft implements Runnable {
 	public Client networkClient;
 	public HitResult hitResult;
 	public Options options;
-	String server;
-	int port;
+	String server = null;
+	int port = 0;
 	volatile boolean running;
 	public String fpsString;
 	public boolean mouseGrabbed;
@@ -122,6 +122,10 @@ public final class Minecraft implements Runnable {
 		this.height = var4;
 		this.fullscreen = false;
 		this.raining = false;
+	}
+	
+	public final void setServer(String var1) {
+		server = var1;
 	}
 
 	public final void setScreen(Screen var1) {
@@ -168,13 +172,16 @@ public final class Minecraft implements Runnable {
 
 		Minecraft var5 = this;
 		try {
-			if(var5.level != null) {
+			if(this.networkClient == null && var5.level != null) {
 				LevelIO.save(var5.level, new VFile2("level.dat"));
 			}
 		} catch (Exception var2) {
 			var2.printStackTrace();
 		}
 
+		if(this.networkClient != null) {
+			networkClient.serverConnection.disconnect();
+		}
 		EagRuntime.destroy();
 	}
 
@@ -239,10 +246,10 @@ public final class Minecraft implements Runnable {
 				} catch (Exception var41) {
 					var41.printStackTrace();
 				}
-			}
 
-			if(this.level == null) {
-				this.generateLevel(1);
+				if(this.level == null) {
+					this.generateLevel(1);
+				}
 			}
 
 			this.particleEngine = new ParticleEngine(this.level, this.textures);
@@ -250,7 +257,7 @@ public final class Minecraft implements Runnable {
 			checkGlError("Post startup");
 			this.gui = new Gui(this, this.width, this.height);
 			if(this.server != null && this.user != null) {
-				this.networkClient = new Client(this, this.server, this.port, this.user.name);
+				this.networkClient = new Client(this, this.server, this.user.name);
 			}
 		} catch (Exception var49) {
 			var49.printStackTrace();
@@ -264,7 +271,10 @@ public final class Minecraft implements Runnable {
 		try {
 			while(this.running) {
 				if(Display.isCloseRequested()) {
-						this.running = false;
+					if(this.networkClient != null) {
+						networkClient.serverConnection.disconnect();
+					}
+					this.running = false;
 				}
 
 					try {
@@ -623,9 +633,7 @@ public final class Minecraft implements Runnable {
 											}
 										}
 
-										GL11.glBindTexture(GL11.GL_TEXTURE_2D, var66.textures.loadTexture("/rock.png"));
-										GL11.glEnable(GL11.GL_TEXTURE_2D);
-										GL11.glCallList(var66.surroundLists);
+										var66.renderSurroundingGround();
 										var89.setupFog();
 										var101 = var66;
 										GL11.glBindTexture(GL11.GL_TEXTURE_2D, var66.textures.loadTexture("/clouds.png"));
@@ -792,8 +800,8 @@ public final class Minecraft implements Runnable {
 										var89.setupFog();
 										GL11.glEnable(GL11.GL_TEXTURE_2D);
 										GL11.glEnable(GL11.GL_BLEND);
-										GL11.glBindTexture(GL11.GL_TEXTURE_2D, var66.textures.loadTexture("/water.png"));
-										GL11.glCallList(var66.surroundLists + 1);
+//										GL11.glBindTexture(GL11.GL_TEXTURE_2D, var66.textures.loadTexture("/water.png"));
+//										GL11.glCallList(var66.surroundLists + 1);
 										GL11.glDisable(GL11.GL_BLEND);
 										GL11.glEnable(GL11.GL_BLEND);
 //										GL11.glColorMask(false, false, false, false);
@@ -1178,10 +1186,15 @@ public final class Minecraft implements Runnable {
 				Client var18 = this.networkClient;
 				if(var18.processData) {
 					SocketConnection var22 = var18.serverConnection;
-					if(var22.connected) {
+					if(var22.client.isConnected()) {
 						try {
 							SocketConnection var21 = var18.serverConnection;
-							var21.socketChannel.read(var21.readBuffer);
+							IWebSocketFrame packet = var21.webSocket.getNextBinaryFrame();
+							byte[] packetData = packet == null ? null : packet.getByteArray();
+
+							if (packetData != null && packetData.length > 0) {
+								var21.readBuffer.put(packetData);
+							}
 							var4 = 0;
 
 							while(var21.readBuffer.position() > 0 && var4++ != 100) {
@@ -1236,7 +1249,6 @@ public final class Minecraft implements Runnable {
 										var30.setData(var60, var63, var27, var57);
 										var43.minecraft.loadLegacy(var30);
 										var43.minecraft.hideScreen = false;
-										var43.connected = true;
 									} else if(var6 == Packet.SET_TILE) {
 										if(var43.minecraft.level != null) {
 											var43.minecraft.level.netSetTile(((Short)var7[0]).shortValue(), ((Short)var7[1]).shortValue(), ((Short)var7[2]).shortValue(), ((Byte)var7[3]).byteValue());
@@ -1382,18 +1394,14 @@ public final class Minecraft implements Runnable {
 									}
 								}
 
-								if(!var21.connected) {
+								if(!this.networkClient.isConnected()) {
 									break;
 								}
 
 								var21.readBuffer.compact();
 							}
 
-							if(var21.writeBuffer.position() > 0) {
-								var21.writeBuffer.flip();
-								var21.socketChannel.write(var21.writeBuffer);
-								var21.writeBuffer.compact();
-							}
+							var21.flush();
 						} catch (Exception var15) {
 							var18.minecraft.setScreen(new ErrorScreen("Disconnected!", "You\'ve lost connection to the server"));
 							var18.minecraft.hideScreen = false;
@@ -1406,7 +1414,7 @@ public final class Minecraft implements Runnable {
 
 				Player var31 = this.player;
 				var18 = this.networkClient;
-				if(var18.connected) {
+				if(this.networkClient.isConnected()) {
 					int var23 = (int)(var31.x * 32.0F);
 					var4 = (int)(var31.y * 32.0F);
 					var38 = (int)(var31.z * 32.0F);
@@ -1628,6 +1636,9 @@ public final class Minecraft implements Runnable {
 				}
 			}
 
+			if(this.networkClient != null) {
+				this.networkClient.tick();
+			}
 			LevelRenderer var26 = this.levelRenderer;
 			++var26.cloudTickCounter;
 			this.level.tickEntities();
@@ -1636,7 +1647,9 @@ public final class Minecraft implements Runnable {
 			}
 
 			this.particleEngine.tick();
-			levelSave();
+			if(this.networkClient == null) {
+				levelSave();
+			}
 		}
 
 	}
@@ -1675,7 +1688,6 @@ public final class Minecraft implements Runnable {
 				}
 			}
 		}
-
 		this.player = (Player) var1.getPlayer();
 		if(this.player == null) {
 			this.player = new Player(var1);
