@@ -6,6 +6,7 @@ import com.mojang.minecraft.mob.Mob;
 import com.mojang.minecraft.mob.ai.BasicAI;
 import com.mojang.minecraft.model.HumanoidModel;
 import com.mojang.minecraft.renderer.Textures;
+import com.mojang.util.Mth;
 
 import net.lax1dude.eaglercraft.opengl.ImageData;
 
@@ -31,15 +32,20 @@ public class Player extends Mob {
 
 	public Player(Level var1) {
 		super(var1);
-		var1.player = this;
-		var1.removeEntity(this);
-		var1.addEntity(this);
+		if(var1 != null) {
+			var1.player = this;
+			var1.removeEntity(this);
+			var1.addEntity(this);
+		}
+
 		this.heightOffset = 1.62F;
 		this.health = 20;
 		this.modelName = "humanoid";
 		this.rotOffs = 180.0F;
 		this.ai = new BasicAI() {
-			protected final void update() {
+			public static final long serialVersionUID = 0L;
+
+			public final void update() {
 				this.jumping = Player.this.input.jumping;
 				this.xxa = Player.this.input.ya;
 				this.yya = Player.this.input.xa;
@@ -51,7 +57,10 @@ public class Player extends Mob {
 		this.heightOffset = 1.62F;
 		this.setSize(0.6F, 1.8F);
 		super.resetPos();
-		this.level.player = this;
+		if(this.level != null) {
+			this.level.player = this;
+		}
+
 		this.health = 20;
 		this.deathTime = 0;
 	}
@@ -61,7 +70,7 @@ public class Player extends Mob {
 		this.oBob = this.bob;
 		this.input.tick();
 		super.aiStep();
-		float var1 = (float)Math.sqrt((double)(this.xd * this.xd + this.zd * this.zd));
+		float var1 = Mth.sqrt_float(this.xd * this.xd + this.zd * this.zd);
 		float var2 = (float)Math.atan((double)(-this.yd * 0.2F)) * 15.0F;
 		if(var1 > 0.1F) {
 			var1 = 0.1F;
@@ -116,8 +125,8 @@ public class Player extends Mob {
 		this.setPos(this.x, this.y, this.z);
 		this.yd = 0.1F;
 		if(var1 != null) {
-			this.xd = -((float)Math.cos((double)(this.hurtDir + this.yRot) * Math.PI / 180.0D)) * 0.1F;
-			this.zd = -((float)Math.sin((double)(this.hurtDir + this.yRot) * Math.PI / 180.0D)) * 0.1F;
+			this.xd = -Mth.cos((this.hurtDir + this.yRot) * (float)Math.PI / 180.0F) * 0.1F;
+			this.zd = -Mth.sin((this.hurtDir + this.yRot) * (float)Math.PI / 180.0F) * 0.1F;
 		} else {
 			this.xd = this.zd = 0.0F;
 		}
@@ -142,11 +151,25 @@ public class Player extends Mob {
 			newTexture = null;
 		}
 
+		int var2;
 		if(texture < 0) {
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, var1.loadTexture("/char.png"));
+			var2 = var1.loadTexture("/char.png");
+			GL11.glBindTexture(GL11.GL_TEXTURE_2D, var2);
 		} else {
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture);
+			var2 = texture;
+			GL11.glBindTexture(GL11.GL_TEXTURE_2D, var2);
 		}
+	}
+
+	public void hurt(Entity var1, int var2) {
+		if(!this.level.creativeMode) {
+			super.hurt(var1, var2);
+		}
+
+	}
+
+	public boolean isCreativeModeAllowed() {
+		return true;
 	}
 	
 	public void writeTo(DataOutputStream out) throws IOException {

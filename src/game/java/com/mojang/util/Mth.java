@@ -1,6 +1,6 @@
 package com.mojang.util;
 
-public class MathHelper {
+public class Mth {
 	private static final int[] MULTIPLY_DE_BRUIJN_BIT_POSITION;
 	public static final float SQRT_2 = sqrt_float(2.0F);
 	private static float[] SIN_TABLE = new float[4096];

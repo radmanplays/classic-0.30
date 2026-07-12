@@ -4,7 +4,8 @@ import com.mojang.minecraft.Entity;
 import com.mojang.minecraft.level.Level;
 import com.mojang.minecraft.level.tile.Tile;
 import com.mojang.minecraft.mob.ai.BasicAttackAI;
-import com.mojang.minecraft.particle.Particle;
+import com.mojang.minecraft.particle.TerrainParticle;
+import com.mojang.util.Mth;
 
 public class Creeper extends Mob {
 	public static final long serialVersionUID = 0L;
@@ -15,6 +16,8 @@ public class Creeper extends Mob {
 		this.modelName = "creeper";
 		this.textureName = "/mob/creeper.png";
 		this.ai = new BasicAttackAI() {
+			public static final long serialVersionUID = 0L;
+
 			public final boolean attack(Entity var1) {
 				if(!super.attack(var1)) {
 					return false;
@@ -32,30 +35,23 @@ public class Creeper extends Mob {
 					float var3 = (float)this.random.nextGaussian() * var1 / 4.0F;
 					float var4 = (float)this.random.nextGaussian() * var1 / 4.0F;
 					float var5 = (float)this.random.nextGaussian() * var1 / 4.0F;
-					float var6 = (float)Math.sqrt((double)(var3 * var3 + var4 * var4 + var5 * var5));
+					float var6 = Mth.sqrt_float(var3 * var3 + var4 * var4 + var5 * var5);
 					float var7 = var3 / var6 / var6;
 					float var8 = var4 / var6 / var6;
 					var6 = var5 / var6 / var6;
-					this.level.particleEngine.addParticle(new Particle(this.level, this.mob.x + var3, this.mob.y + var4, this.mob.z + var5, var7, var8, var6, Tile.leaf));
+					this.level.particleEngine.addParticle(new TerrainParticle(this.level, this.mob.x + var3, this.mob.y + var4, this.mob.z + var5, var7, var8, var6, Tile.leaf));
 				}
 
 			}
 		};
 		this.ai.defaultLookAngle = 45;
+		this.deathScore = 200;
 		this.setPos(var2, var3, var4);
 	}
 
 	public float getBrightness(float var1) {
 		float var2 = (float)(20 - this.health) / 20.0F;
-		var2 = (float)(Math.sin((double)((float)this.tickCount + var1)) * 0.5D + 0.5D) * var2 * 0.5F + 0.25F + var2 * 0.25F;
+		var2 = (Mth.sin((float)this.tickCount + var1) * 0.5F + 0.5F) * var2 * 0.5F + 0.25F + var2 * 0.25F;
 		return var2 * super.getBrightness(var1);
-	}
-
-	public void die(Entity var1) {
-		if(var1 != null) {
-			var1.awardKillScore(this, 250);
-		}
-
-		super.die(var1);
 	}
 }

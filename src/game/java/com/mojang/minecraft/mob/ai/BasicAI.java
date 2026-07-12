@@ -4,7 +4,7 @@ import com.mojang.minecraft.Entity;
 import com.mojang.minecraft.level.Level;
 import com.mojang.minecraft.mob.Mob;
 import java.util.List;
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
 public class BasicAI extends AI {
 	public static final long serialVersionUID = 0L;
@@ -60,7 +60,7 @@ public class BasicAI extends AI {
 			} else if(var9) {
 				var2.yd += 0.04F;
 			} else if(var2.onGround) {
-				var2.yd = 0.42F;
+				this.jumpFromGround();
 			}
 		}
 
@@ -80,7 +80,11 @@ public class BasicAI extends AI {
 
 	}
 
-	protected void update() {
+	protected void jumpFromGround() {
+		this.mob.yd = 0.42F;
+	}
+
+	public void update() {
 		if(this.random.nextFloat() < 0.07F) {
 			this.xxa = (this.random.nextFloat() - 0.5F) * this.runSpeed;
 			this.yya = this.random.nextFloat() * this.runSpeed;

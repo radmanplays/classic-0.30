@@ -7,9 +7,9 @@ public final class Cube {
 	public Polygon[] polygons;
 	private int xTexOffs;
 	private int yTexOffs;
-	private float x;
-	private float y;
-	private float z;
+	public float x;
+	public float y;
+	public float z;
 	public float xRot;
 	public float yRot;
 	public float zRot;
@@ -91,14 +91,32 @@ public final class Cube {
 				this.translateTo(var1);
 			}
 
-			float var2 = 57.29578F;
-			GL11.glPushMatrix();
-			GL11.glTranslatef(this.x * var1, this.y * var1, this.z * var1);
-			GL11.glRotatef(this.zRot * var2, 0.0F, 0.0F, 1.0F);
-			GL11.glRotatef(this.yRot * var2, 0.0F, 1.0F, 0.0F);
-			GL11.glRotatef(this.xRot * var2, 1.0F, 0.0F, 0.0F);
-			GL11.glCallList(this.list);
-			GL11.glPopMatrix();
+			if(this.xRot == 0.0F && this.yRot == 0.0F && this.zRot == 0.0F) {
+				if(this.x == 0.0F && this.y == 0.0F && this.z == 0.0F) {
+					GL11.glCallList(this.list);
+				} else {
+					GL11.glTranslatef(this.x * var1, this.y * var1, this.z * var1);
+					GL11.glCallList(this.list);
+					GL11.glTranslatef(-this.x * var1, -this.y * var1, -this.z * var1);
+				}
+			} else {
+				GL11.glPushMatrix();
+				GL11.glTranslatef(this.x * var1, this.y * var1, this.z * var1);
+				if(this.zRot != 0.0F) {
+					GL11.glRotatef(this.zRot * (180.0F / (float)Math.PI), 0.0F, 0.0F, 1.0F);
+				}
+
+				if(this.yRot != 0.0F) {
+					GL11.glRotatef(this.yRot * (180.0F / (float)Math.PI), 0.0F, 1.0F, 0.0F);
+				}
+
+				if(this.xRot != 0.0F) {
+					GL11.glRotatef(this.xRot * (180.0F / (float)Math.PI), 1.0F, 0.0F, 0.0F);
+				}
+
+				GL11.glCallList(this.list);
+				GL11.glPopMatrix();
+			}
 		}
 	}
 

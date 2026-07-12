@@ -2,17 +2,19 @@ package com.mojang.minecraft.gui;
 
 import com.mojang.minecraft.GuiMessage;
 import com.mojang.minecraft.Minecraft;
+import com.mojang.minecraft.gamemode.SurvivalGameMode;
 import com.mojang.minecraft.level.tile.Tile;
 import com.mojang.minecraft.player.Inventory;
 import com.mojang.minecraft.renderer.Tesselator;
 import com.mojang.minecraft.renderer.Textures;
+import com.mojang.util.Mth;
 
 import net.lax1dude.eaglercraft.Display;
 import net.lax1dude.eaglercraft.Mouse;
-import net.lax1dude.eaglercraft.Random;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
@@ -40,7 +42,7 @@ public final class Gui extends GuiComponent {
 	            }
 	        }
 	    }
-		this.minecraft.lighting.init();
+		this.minecraft.gameRenderer.render();
 		Textures var6 = this.minecraft.textures;
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.minecraft.textures.loadTexture("/gui/gui.png"));
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -61,52 +63,53 @@ public final class Gui extends GuiComponent {
 		int var10 = this.minecraft.player.health;
 		int var11 = this.minecraft.player.lastHealth;
 		this.random.setSeed((long)(this.tickCounter * 312871));
-
 		int var12;
 		int var14;
 		int var15;
-		for(var12 = 0; var12 < 10; ++var12) {
-			byte var13 = 0;
-			if(var9) {
-				var13 = 1;
-			}
-
-			var14 = this.scaledWidth / 2 - 91 + (var12 << 3);
-			var15 = this.scaledHeight - 32;
-			if(var10 <= 4) {
-				var15 += this.random.nextInt(2);
-			}
-
-			this.blit(var14, var15, 16 + var13 * 9, 0, 9, 9);
-			if(var9) {
-				if((var12 << 1) + 1 < var11) {
-					this.blit(var14, var15, 70, 0, 9, 9);
-				}
-
-				if((var12 << 1) + 1 == var11) {
-					this.blit(var14, var15, 79, 0, 9, 9);
-				}
-			}
-
-			if((var12 << 1) + 1 < var10) {
-				this.blit(var14, var15, 52, 0, 9, 9);
-			}
-
-			if((var12 << 1) + 1 == var10) {
-				this.blit(var14, var15, 61, 0, 9, 9);
-			}
-		}
-
 		int var25;
-		if(this.minecraft.player.isUnderWater()) {
-			var12 = (int)Math.ceil((double)(this.minecraft.player.airSupply - 2) * 10.0D / 300.0D);
-			var25 = (int)Math.ceil((double)this.minecraft.player.airSupply * 10.0D / 300.0D) - var12;
+		if(this.minecraft.gamemode.canHurtPlayer()) {
+			for(var12 = 0; var12 < 10; ++var12) {
+				byte var13 = 0;
+				if(var9) {
+					var13 = 1;
+				}
 
-			for(var14 = 0; var14 < var12 + var25; ++var14) {
-				if(var14 < var12) {
-					this.blit(this.scaledWidth / 2 - 91 + (var14 << 3), this.scaledHeight - 32 - 9, 16, 18, 9, 9);
-				} else {
-					this.blit(this.scaledWidth / 2 - 91 + (var14 << 3), this.scaledHeight - 32 - 9, 25, 18, 9, 9);
+				var14 = this.scaledWidth / 2 - 91 + (var12 << 3);
+				var15 = this.scaledHeight - 32;
+				if(var10 <= 4) {
+					var15 += this.random.nextInt(2);
+				}
+
+				this.blit(var14, var15, 16 + var13 * 9, 0, 9, 9);
+				if(var9) {
+					if((var12 << 1) + 1 < var11) {
+						this.blit(var14, var15, 70, 0, 9, 9);
+					}
+
+					if((var12 << 1) + 1 == var11) {
+						this.blit(var14, var15, 79, 0, 9, 9);
+					}
+				}
+
+				if((var12 << 1) + 1 < var10) {
+					this.blit(var14, var15, 52, 0, 9, 9);
+				}
+
+				if((var12 << 1) + 1 == var10) {
+					this.blit(var14, var15, 61, 0, 9, 9);
+				}
+			}
+
+			if(this.minecraft.player.isUnderWater()) {
+				var12 = (int)Math.ceil((double)(this.minecraft.player.airSupply - 2) * 10.0D / 300.0D);
+				var25 = (int)Math.ceil((double)this.minecraft.player.airSupply * 10.0D / 300.0D) - var12;
+
+				for(var14 = 0; var14 < var12 + var25; ++var14) {
+					if(var14 < var12) {
+						this.blit(this.scaledWidth / 2 - 91 + (var14 << 3), this.scaledHeight - 32 - 9, 16, 18, 9, 9);
+					} else {
+						this.blit(this.scaledWidth / 2 - 91 + (var14 << 3), this.scaledHeight - 32 - 9, 25, 18, 9, 9);
+					}
 				}
 			}
 		}
@@ -123,9 +126,9 @@ public final class Gui extends GuiComponent {
 				GL11.glTranslatef((float)var25, (float)var14, -50.0F);
 				if(var8.popTime[var12] > 0) {
 					float var18 = ((float)var8.popTime[var12] - var1) / 5.0F;
-					float var19 = -((float)Math.sin((double)(var18 * var18) * Math.PI)) * 8.0F;
-					float var23 = (float)Math.sin((double)(var18 * var18) * Math.PI) + 1.0F;
-					float var16 = (float)Math.sin((double)var18 * Math.PI) + 1.0F;
+					float var19 = -Mth.sin(var18 * var18 * (float)Math.PI) * 8.0F;
+					float var23 = Mth.sin(var18 * var18 * (float)Math.PI) + 1.0F;
+					float var16 = Mth.sin(var18 * (float)Math.PI) + 1.0F;
 					GL11.glTranslatef(10.0F, var19 + 10.0F, 0.0F);
 					GL11.glScalef(var23, var16, 1.0F);
 					GL11.glTranslatef(-10.0F, -10.0F, 0.0F);
@@ -139,11 +142,12 @@ public final class Gui extends GuiComponent {
 				GL11.glScalef(-1.0F, -1.0F, -1.0F);
 				GL11.glEnable(GL11.GL_ALPHA_TEST);
 				GL11.glAlphaFunc(GL11.GL_GREATER, 0.1f);
+				GL11.glEnable(GL11.GL_TEXTURE_2D);
 				int var20 = var6.loadTexture("/terrain.png");
 				GL11.glBindTexture(GL11.GL_TEXTURE_2D, var20);
 				GL11.glEnable(GL11.GL_TEXTURE_2D);
 				var7.begin();
-				Tile.tiles[var15].render(var7, this.minecraft.level, 0, -2, 0, 0);
+				Tile.tiles[var15].render(var7);
 				var7.end();
 				GL11.glDisable(GL11.GL_TEXTURE_2D);
 				GL11.glPopMatrix();
@@ -154,23 +158,26 @@ public final class Gui extends GuiComponent {
 			}
 		}
 
-		var5.drawShadow("0.25_05   SURVIVAL TEST", 2, 2, 16777215);
+		var5.drawShadow("0.30", 2, 2, 16777215);
 		if(this.minecraft.options.showFramerate) {
 			var5.drawShadow(this.minecraft.fpsString, 2, 12, 16777215);
 		}
 
-		String score = "Score: &e" + this.minecraft.player.getScore();
-		var5.drawShadow(score, this.scaledWidth - var5.width(score) - 2, 2, 16777215);
-		var5.drawShadow("Arrows: " + this.minecraft.player.arrows, this.scaledWidth / 2 + 8, this.scaledHeight - 33, 16777215);
-		byte var24 = 10;
-		boolean var26 = false;
-		if(this.minecraft.screen instanceof ChatScreen) {
-			var24 = 20;
-			var26 = true;
+		if(this.minecraft.gamemode instanceof SurvivalGameMode) {
+			String var24 = "Score: &e" + this.minecraft.player.getScore();
+			var5.drawShadow(var24, this.scaledWidth - var5.width(var24) - 2, 2, 16777215);
+			var5.drawShadow("Arrows: " + this.minecraft.player.arrows, this.scaledWidth / 2 + 8, this.scaledHeight - 33, 16777215);
 		}
 
-		for(var14 = 0; var14 < this.messages.size() && var14 < var24; ++var14) {
-			if(((GuiMessage)this.messages.get(var14)).counter < 200 || var26) {
+		byte var26 = 10;
+		boolean var27 = false;
+		if(this.minecraft.screen instanceof ChatScreen) {
+			var26 = 20;
+			var27 = true;
+		}
+
+		for(var14 = 0; var14 < this.messages.size() && var14 < var26; ++var14) {
+			if(((GuiMessage)this.messages.get(var14)).counter < 200 || var27) {
 				var5.drawShadow(((GuiMessage)this.messages.get(var14)).message, 2, this.scaledHeight - 8 - var14 * 9 - 20, 16777215);
 			}
 		}
@@ -178,9 +185,10 @@ public final class Gui extends GuiComponent {
 		var14 = this.scaledWidth / 2;
 		var15 = this.scaledHeight / 2;
 		this.hoveredUsername = null;
-		if(Keyboard.isKeyDown(Keyboard.KEY_TAB) && false) {
-//			List var22 = this.minecraft.networkClient.getUsernames();
+		if(Keyboard.isKeyDown(Keyboard.KEY_TAB) && this.minecraft.networkClient != null && this.minecraft.networkClient.isConnected()) {
+			List var22 = this.minecraft.networkClient.getUsernames();
 			GL11.glEnable(GL11.GL_BLEND);
+			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 			GL11.glBegin(GL11.GL_QUADS);
 			GL11.glColor4f(0.0F, 0.0F, 0.0F, 0.7F);
@@ -191,19 +199,20 @@ public final class Gui extends GuiComponent {
 			GL11.glVertex2f((float)(var14 + 128), (float)(var15 + 68));
 			GL11.glEnd();
 			GL11.glDisable(GL11.GL_BLEND);
+			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			var21 = "Connected players:";
 			var5.drawShadow(var21, var14 - var5.width(var21) / 2, var15 - 64 - 12, 16777215);
 
-//			for(var11 = 0; var11 < var22.size(); ++var11) {
-//				int var27 = var14 + var11 % 2 * 120 - 120;
-//				int var17 = var15 - 64 + (var11 / 2 << 3);
-//				if(var2 && var3 >= var27 && var4 >= var17 && var3 < var27 + 120 && var4 < var17 + 8) {
-//					this.hoveredUsername = (String)var22.get(var11);
-//					var5.draw((String)var22.get(var11), var27 + 2, var17, 16777215);
-//				} else {
-//					var5.draw((String)var22.get(var11), var27, var17, 15658734);
-//				}
-//			}
+			for(var11 = 0; var11 < var22.size(); ++var11) {
+				int var28 = var14 + var11 % 2 * 120 - 120;
+				int var17 = var15 - 64 + (var11 / 2 << 3);
+				if(var2 && var3 >= var28 && var4 >= var17 && var3 < var28 + 120 && var4 < var17 + 8) {
+					this.hoveredUsername = (String)var22.get(var11);
+					var5.draw((String)var22.get(var11), var28 + 2, var17, 16777215);
+				} else {
+					var5.draw((String)var22.get(var11), var28, var17, 15658734);
+				}
+			}
 		}
 
 	}

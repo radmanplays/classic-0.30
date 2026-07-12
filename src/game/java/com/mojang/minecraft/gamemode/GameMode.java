@@ -13,6 +13,14 @@ public class GameMode {
 		this.minecraft = var1;
 	}
 
+	public void initLevel(Level var1) {
+		var1.creativeMode = false;
+		var1.growTrees = true;
+	}
+
+	public void handleOpenInventory() {
+	}
+
 	public void startDestroyBlock(int var1, int var2, int var3) {
 		this.destroyBlock(var1, var2, var3);
 	}
@@ -26,6 +34,9 @@ public class GameMode {
 		Tile var5 = Tile.tiles[var4.getTile(var1, var2, var3)];
 		boolean var6 = var4.netSetTile(var1, var2, var3, 0);
 		if(var5 != null && var6) {
+			if(this.minecraft.isOnlineClient()) {
+				this.minecraft.networkClient.sendTileUpdated(var1, var2, var3, 0, this.minecraft.player.inventory.getSelected());
+			}
 
 			if(var5.soundType != Tile.SoundType.none) {
 				var4.playSound("step." + var5.soundType.name, (float)var1, (float)var2, (float)var3, (var5.soundType.getVolume() + 1.0F) / 2.0F, var5.soundType.getPitch() * 0.8F);
@@ -36,10 +47,10 @@ public class GameMode {
 
 	}
 
-	public void stopDestroyingBlock(int var1, int var2, int var3, int var4) {
+	public void continueDestroyBlock(int var1, int var2, int var3, int var4) {
 	}
 
-	public void tick() {
+	public void stopDestroyBlock() {
 	}
 
 	public void render(float var1) {
@@ -51,5 +62,21 @@ public class GameMode {
 
 	public boolean removeResource(Player var1, int var2) {
 		return false;
+	}
+
+	public void initPlayer(Player var1) {
+	}
+
+	public void tick() {
+	}
+
+	public void createPlayer(Level var1) {
+	}
+
+	public boolean canHurtPlayer() {
+		return true;
+	}
+
+	public void adjustPlayer(Player var1) {
 	}
 }

@@ -3,12 +3,13 @@ package com.mojang.minecraft.mob.ai;
 import com.mojang.minecraft.Entity;
 import com.mojang.minecraft.item.Arrow;
 import com.mojang.minecraft.model.Vec3;
+import com.mojang.util.Mth;
 
 public class BasicAttackAI extends BasicAI {
 	public static final long serialVersionUID = 0L;
 	public int damage = 6;
 
-	protected void update() {
+	public void update() {
 		super.update();
 		if(this.mob.health > 0) {
 			this.doAttack();
@@ -47,10 +48,10 @@ public class BasicAttackAI extends BasicAI {
 			}
 
 			if(this.attackTarget != null) {
-				var6 = (float)Math.sqrt((double)var6);
-				this.mob.yRot = (float)(Math.atan2((double)var5, (double)var3) * 180.0D / Math.PI) - 90.0F;
-				this.mob.xRot = -((float)(Math.atan2((double)var4, (double)var6) * 180.0D / Math.PI));
-				var6 = (float)Math.sqrt((double)(var3 * var3 + var4 * var4 + var5 * var5));
+				var6 = Mth.sqrt_float(var6);
+				this.mob.yRot = (float)(Math.atan2((double)var5, (double)var3) * 180.0D / (double)((float)Math.PI)) - 90.0F;
+				this.mob.xRot = -((float)(Math.atan2((double)var4, (double)var6) * 180.0D / (double)((float)Math.PI)));
+				var6 = Mth.sqrt_float(var3 * var3 + var4 * var4 + var5 * var5);
 				if(var6 < 2.0F && this.attackDelay == 0) {
 					this.attack(this.attackTarget);
 				}

@@ -1,77 +1,88 @@
 package com.mojang.minecraft.level.tile;
 
+import com.mojang.minecraft.HitResult;
 import com.mojang.minecraft.item.Item;
 import com.mojang.minecraft.level.Level;
 import com.mojang.minecraft.level.liquid.Liquid;
-import com.mojang.minecraft.particle.Particle;
+import com.mojang.minecraft.model.Vec3;
 import com.mojang.minecraft.particle.ParticleEngine;
+import com.mojang.minecraft.particle.TerrainParticle;
 import com.mojang.minecraft.phys.AABB;
 import com.mojang.minecraft.renderer.Tesselator;
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
 public class Tile {
-	public static boolean isNormalTile = true;
 	protected static Random random = new Random();
 	public static final Tile[] tiles = new Tile[256];
 	public static final boolean[] shouldTick = new boolean[256];
-	public static final boolean[] isSolid = new boolean[256];
-	public static final boolean[] isOpaque = new boolean[256];
+	private static boolean[] isSolid = new boolean[256];
+	private static boolean[] isOpaque = new boolean[256];
 	public static final boolean[] isLiquid = new boolean[256];
 	private static int[] tickSpeed = new int[256];
-	public static final Tile rock = (new Tile(1, 1)).setSoundAndGravity(Tile.SoundType.stone, 1.0F, 1.0F, 1.0F);
-	public static final Tile grass = (new GrassTile(2)).setSoundAndGravity(Tile.SoundType.grass, 0.9F, 1.0F, 0.6F);
-	public static final Tile dirt = (new DirtTile(3, 2)).setSoundAndGravity(Tile.SoundType.grass, 0.8F, 1.0F, 0.5F);
-	public static final Tile stoneBrick = (new Tile(4, 16)).setSoundAndGravity(Tile.SoundType.stone, 1.0F, 1.0F, 2.0F);
-	public static final Tile wood = (new Tile(5, 4)).setSoundAndGravity(Tile.SoundType.wood, 1.0F, 1.0F, 2.0F);
-	public static final Tile bush = (new Bush(6, 15)).setSoundAndGravity(Tile.SoundType.none, 0.7F, 1.0F, 0.0F);
-	public static final Tile unbreakable = (new Tile(7, 17)).setSoundAndGravity(Tile.SoundType.stone, 1.0F, 1.0F, 100.0F);
-	public static final Tile water = (new LiquidTile(8, Liquid.water)).setSoundAndGravity(Tile.SoundType.none, 1.0F, 1.0F, 100.0F);
-	public static final Tile calmWater = (new CalmLiquidTile(9, Liquid.water)).setSoundAndGravity(Tile.SoundType.none, 1.0F, 1.0F, 100.0F);
-	public static final Tile lava = (new LiquidTile(10, Liquid.lava)).setSoundAndGravity(Tile.SoundType.none, 1.0F, 1.0F, 100.0F);
-	public static final Tile calmLava = (new CalmLiquidTile(11, Liquid.lava)).setSoundAndGravity(Tile.SoundType.none, 1.0F, 1.0F, 100.0F);
-	public static final Tile sand = (new FallingTile(12, 18)).setSoundAndGravity(Tile.SoundType.gravel, 0.8F, 1.0F, 0.5F);
-	public static final Tile gravel = (new FallingTile(13, 19)).setSoundAndGravity(Tile.SoundType.gravel, 0.8F, 1.0F, 0.6F);
-	public static final Tile goldOre = (new Tile(14, 32)).setSoundAndGravity(Tile.SoundType.stone, 1.0F, 1.0F, 3.0F);
-	public static final Tile ironOre = (new Tile(15, 33)).setSoundAndGravity(Tile.SoundType.stone, 1.0F, 1.0F, 3.0F);
-	public static final Tile coalOre = (new Tile(16, 34)).setSoundAndGravity(Tile.SoundType.stone, 1.0F, 1.0F, 3.0F);
-	public static final Tile log = (new LogTile(17)).setSoundAndGravity(Tile.SoundType.wood, 1.0F, 1.0F, 2.5F);
-	public static final Tile leaf = (new LeafTile(18, 22)).setSoundAndGravity(Tile.SoundType.grass, 1.0F, 0.4F, 0.2F);
-	public static final Tile sponge = (new SpongeTile(19)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 0.9F, 0.6F);
-	public static final Tile glass = (new GlassTile(20, 49, false)).setSoundAndGravity(Tile.SoundType.metal, 1.0F, 1.0F, 0.3F);
-	public static final Tile clothRed = (new Tile(21, 64)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
-	public static final Tile clothOrange = (new Tile(22, 65)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
-	public static final Tile clothYellow = (new Tile(23, 66)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
-	public static final Tile clothChartreuse = (new Tile(24, 67)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
-	public static final Tile clothGreen = (new Tile(25, 68)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
-	public static final Tile clothSpringGreen = (new Tile(26, 69)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
-	public static final Tile clothCyan = (new Tile(27, 70)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
-	public static final Tile clothCapri = (new Tile(28, 71)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
-	public static final Tile clothUltramarine = (new Tile(29, 72)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
-	public static final Tile clothViolet = (new Tile(30, 73)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
-	public static final Tile clothPurple = (new Tile(31, 74)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
-	public static final Tile clothMagenta = (new Tile(32, 75)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
-	public static final Tile clothRose = (new Tile(33, 76)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
-	public static final Tile clothDarkGray = (new Tile(34, 77)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
-	public static final Tile clothGray = (new Tile(35, 78)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
-	public static final Tile clothWhite = (new Tile(36, 79)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
-	public static final Tile flower = (new Flower(37, 13)).setSoundAndGravity(Tile.SoundType.none, 0.7F, 1.0F, 0.0F);
-	public static final Tile rose = (new Flower(38, 12)).setSoundAndGravity(Tile.SoundType.none, 0.7F, 1.0F, 0.0F);
-	public static final Tile mushroom1 = (new Mushroom(39, 29)).setSoundAndGravity(Tile.SoundType.none, 0.7F, 1.0F, 0.0F);
-	public static final Tile mushroom2 = (new Mushroom(40, 28)).setSoundAndGravity(Tile.SoundType.none, 0.7F, 1.0F, 0.0F);
-	public static final Tile goldBlock = (new Tile(41, 40)).setSoundAndGravity(Tile.SoundType.metal, 0.7F, 1.0F, 3.0F);
+	public static final Tile rock;
+	public static final Tile grass;
+	public static final Tile dirt;
+	public static final Tile stoneBrick;
+	public static final Tile wood;
+	public static final Tile bush;
+	public static final Tile unbreakable;
+	public static final Tile water;
+	public static final Tile calmWater;
+	public static final Tile lava;
+	public static final Tile calmLava;
+	public static final Tile sand;
+	public static final Tile gravel;
+	public static final Tile goldOre;
+	public static final Tile ironOre;
+	public static final Tile coalOre;
+	public static final Tile log;
+	public static final Tile leaf;
+	public static final Tile sponge;
+	public static final Tile glass;
+	public static final Tile clothRed;
+	public static final Tile clothOrange;
+	public static final Tile clothYellow;
+	public static final Tile clothChartreuse;
+	public static final Tile clothGreen;
+	public static final Tile clothSpringGreen;
+	public static final Tile clothCyan;
+	public static final Tile clothCapri;
+	public static final Tile clothUltramarine;
+	public static final Tile clothViolet;
+	public static final Tile clothPurple;
+	public static final Tile clothMagenta;
+	public static final Tile clothRose;
+	public static final Tile clothDarkGray;
+	public static final Tile clothGray;
+	public static final Tile clothWhite;
+	public static final Tile flower;
+	public static final Tile rose;
+	public static final Tile mushroom1;
+	public static final Tile mushroom2;
+	public static final Tile gold;
+	public static final Tile iron;
+	public static final Tile slabFull;
+	public static final Tile slabHalf;
+	public static final Tile brick;
+	public static final Tile tnt;
+	public static final Tile bookshelf;
+	public static final Tile mossStone;
+	public static final Tile obsidian;
 	public int tex;
 	public final int id;
 	public Tile.SoundType soundType;
 	private int destroyProgress;
-	private float xx0;
-	private float yy0;
-	private float zz0;
-	private float xx1;
-	private float yy1;
-	private float zz1;
+	private boolean explodeable;
+	public float xx0;
+	public float yy0;
+	public float zz0;
+	public float xx1;
+	public float yy1;
+	public float zz1;
 	public float particleGravity;
 
 	protected Tile(int var1) {
+		this.explodeable = true;
 		tiles[var1] = this;
 		this.id = var1;
 		this.setShape(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
@@ -113,63 +124,30 @@ public class Tile {
 		tickSpeed[this.id] = 16;
 	}
 
-	public boolean render(Tesselator var1, Level var2, int var3, int var4, int var5, int var6) {
-		boolean var7 = false;
-		float var8 = 0.5F;
-		float var9 = 0.8F;
-		float var10 = 0.6F;
-		float var11;
-		if(this.shouldRenderFace(var2, var4, var5 - 1, var6, var3, 0)) {
-			var11 = this.getBrightness(var2, var4, var5 - 1, var6);
-			var1.color(var8 * var11, var8 * var11, var8 * var11);
-			this.renderFace(var1, var4, var5, var6, 0);
-			var7 = true;
-		}
-
-		if(this.shouldRenderFace(var2, var4, var5 + 1, var6, var3, 1)) {
-			var11 = this.getBrightness(var2, var4, var5 + 1, var6);
-			var1.color(var11 * 1.0F, var11 * 1.0F, var11 * 1.0F);
-			this.renderFace(var1, var4, var5, var6, 1);
-			var7 = true;
-		}
-
-		if(this.shouldRenderFace(var2, var4, var5, var6 - 1, var3, 2)) {
-			var11 = this.getBrightness(var2, var4, var5, var6 - 1);
-			var1.color(var9 * var11, var9 * var11, var9 * var11);
-			this.renderFace(var1, var4, var5, var6, 2);
-			var7 = true;
-		}
-
-		if(this.shouldRenderFace(var2, var4, var5, var6 + 1, var3, 3)) {
-			var11 = this.getBrightness(var2, var4, var5, var6 + 1);
-			var1.color(var9 * var11, var9 * var11, var9 * var11);
-			this.renderFace(var1, var4, var5, var6, 3);
-			var7 = true;
-		}
-
-		if(this.shouldRenderFace(var2, var4 - 1, var5, var6, var3, 4)) {
-			var11 = this.getBrightness(var2, var4 - 1, var5, var6);
-			var1.color(var10 * var11, var10 * var11, var10 * var11);
-			this.renderFace(var1, var4, var5, var6, 4);
-			var7 = true;
-		}
-
-		if(this.shouldRenderFace(var2, var4 + 1, var5, var6, var3, 5)) {
-			var11 = this.getBrightness(var2, var4 + 1, var5, var6);
-			var1.color(var10 * var11, var10 * var11, var10 * var11);
-			this.renderFace(var1, var4, var5, var6, 5);
-			var7 = true;
-		}
-
-		return var7;
+	public void render(Tesselator var1) {
+		float var2 = 0.5F;
+		float var3 = 0.8F;
+		float var4 = 0.6F;
+		var1.color(var2, var2, var2);
+		this.renderFace(var1, -2, 0, 0, 0);
+		var1.color(1.0F, 1.0F, 1.0F);
+		this.renderFace(var1, -2, 0, 0, 1);
+		var1.color(var3, var3, var3);
+		this.renderFace(var1, -2, 0, 0, 2);
+		var1.color(var3, var3, var3);
+		this.renderFace(var1, -2, 0, 0, 3);
+		var1.color(var4, var4, var4);
+		this.renderFace(var1, -2, 0, 0, 4);
+		var1.color(var4, var4, var4);
+		this.renderFace(var1, -2, 0, 0, 5);
 	}
 
 	protected float getBrightness(Level var1, int var2, int var3, int var4) {
 		return var1.getBrightness(var2, var3, var4);
 	}
 
-	public boolean shouldRenderFace(Level var1, int var2, int var3, int var4, int var5, int var6) {
-		return var5 == 1 ? false : !var1.isSolidTile(var2, var3, var4);
+	public boolean shouldRenderFace(Level var1, int var2, int var3, int var4, int var5) {
+		return !var1.isSolidTile(var2, var3, var4);
 	}
 
 	protected int getTexture(int var1) {
@@ -183,124 +161,57 @@ public class Tile {
 
 	public final void renderFaceNoTexture(Tesselator var1, int var2, int var3, int var4, int var5, int var6) {
 		int var7 = var6 % 16 << 4;
-		var6 = var6 / 16 << 4;
-		float var8 = (float)var7 / 256.0F;
+		int var8 = var6 / 16 << 4;
+		float var9 = (float)var7 / 256.0F;
 		float var17 = ((float)var7 + 15.99F) / 256.0F;
-		float var9 = (float)var6 / 256.0F;
-		float var16 = ((float)var6 + 15.99F) / 256.0F;
-		float var10 = (float)var2 + this.xx0;
+		float var10 = (float)var8 / 256.0F;
+		float var11 = ((float)var8 + 15.99F) / 256.0F;
+		if(var5 >= 2 && var6 < 240) {
+			if(this.yy0 >= 0.0F && this.yy1 <= 1.0F) {
+				var10 = ((float)var8 + this.yy0 * 15.99F) / 256.0F;
+				var11 = ((float)var8 + this.yy1 * 15.99F) / 256.0F;
+			} else {
+				var10 = (float)var8 / 256.0F;
+				var11 = ((float)var8 + 15.99F) / 256.0F;
+			}
+		}
+
+		float var16 = (float)var2 + this.xx0;
 		float var14 = (float)var2 + this.xx1;
-		float var11 = (float)var3 + this.yy0;
+		float var18 = (float)var3 + this.yy0;
 		float var15 = (float)var3 + this.yy1;
 		float var12 = (float)var4 + this.zz0;
 		float var13 = (float)var4 + this.zz1;
 		if(var5 == 0) {
-			var1.vertexUV(var10, var11, var13, var8, var16);
-			var1.vertexUV(var10, var11, var12, var8, var9);
-			var1.vertexUV(var14, var11, var12, var17, var9);
-			var1.vertexUV(var14, var11, var13, var17, var16);
+			var1.vertexUV(var16, var18, var13, var9, var11);
+			var1.vertexUV(var16, var18, var12, var9, var10);
+			var1.vertexUV(var14, var18, var12, var17, var10);
+			var1.vertexUV(var14, var18, var13, var17, var11);
 		} else if(var5 == 1) {
-			var1.vertexUV(var14, var15, var13, var17, var16);
-			var1.vertexUV(var14, var15, var12, var17, var9);
-			var1.vertexUV(var10, var15, var12, var8, var9);
-			var1.vertexUV(var10, var15, var13, var8, var16);
+			var1.vertexUV(var14, var15, var13, var17, var11);
+			var1.vertexUV(var14, var15, var12, var17, var10);
+			var1.vertexUV(var16, var15, var12, var9, var10);
+			var1.vertexUV(var16, var15, var13, var9, var11);
 		} else if(var5 == 2) {
-			var1.vertexUV(var10, var15, var12, var17, var9);
-			var1.vertexUV(var14, var15, var12, var8, var9);
-			var1.vertexUV(var14, var11, var12, var8, var16);
-			var1.vertexUV(var10, var11, var12, var17, var16);
+			var1.vertexUV(var16, var15, var12, var17, var10);
+			var1.vertexUV(var14, var15, var12, var9, var10);
+			var1.vertexUV(var14, var18, var12, var9, var11);
+			var1.vertexUV(var16, var18, var12, var17, var11);
 		} else if(var5 == 3) {
-			var1.vertexUV(var10, var15, var13, var8, var9);
-			var1.vertexUV(var10, var11, var13, var8, var16);
-			var1.vertexUV(var14, var11, var13, var17, var16);
-			var1.vertexUV(var14, var15, var13, var17, var9);
+			var1.vertexUV(var16, var15, var13, var9, var10);
+			var1.vertexUV(var16, var18, var13, var9, var11);
+			var1.vertexUV(var14, var18, var13, var17, var11);
+			var1.vertexUV(var14, var15, var13, var17, var10);
 		} else if(var5 == 4) {
-			var1.vertexUV(var10, var15, var13, var17, var9);
-			var1.vertexUV(var10, var15, var12, var8, var9);
-			var1.vertexUV(var10, var11, var12, var8, var16);
-			var1.vertexUV(var10, var11, var13, var17, var16);
+			var1.vertexUV(var16, var15, var13, var17, var10);
+			var1.vertexUV(var16, var15, var12, var9, var10);
+			var1.vertexUV(var16, var18, var12, var9, var11);
+			var1.vertexUV(var16, var18, var13, var17, var11);
 		} else if(var5 == 5) {
-			var1.vertexUV(var14, var11, var13, var8, var16);
-			var1.vertexUV(var14, var11, var12, var17, var16);
-			var1.vertexUV(var14, var15, var12, var17, var9);
-			var1.vertexUV(var14, var15, var13, var8, var9);
-		}
-	}
-
-	public final void renderFace(Tesselator var1, int var2, int var3, int var4, int var5, int var6) {
-		int var7 = this.getTexture(var5);
-		int var10006 = var7;
-		var7 = var6;
-		var6 = var10006;
-		float var8;
-		float var9;
-		float var10;
-		int var11;
-		int var12;
-		float var18;
-		if(!isNormalTile) {
-			var11 = var6 % 16 << 4;
-			var12 = var6 / 16 << 4;
-			var18 = (float)var11 / 256.0F;
-			var8 = ((float)var11 + 15.99F) / 256.0F;
-			var9 = (float)var12 / 256.0F;
-			var10 = ((float)var12 + 15.99F) / 256.0F;
-		} else {
-			var11 = var6 % 16;
-			var12 = (var11 << 4) + var6 / 16 << 4;
-			var18 = 0.0F;
-			var8 = 0.0F;
-			var9 = (float)var12 / 4096.0F;
-			var10 = ((float)var12 + 15.99F) / 4096.0F;
-			var8 = 1.0F + (float)var7;
-		}
-
-		float var19 = 0.001F;
-		float var20 = (float)var2 + this.xx0 - var19;
-		float var16 = (float)var2 + this.xx1 + var19;
-		float var13 = (float)var3 + this.yy0 - var19;
-		float var17 = (float)var3 + this.yy1 + var19;
-		float var14 = (float)var4 + this.zz0 - var19;
-		float var15 = (float)var4 + this.zz1 - var19;
-		if(var5 == 0) {
-			var16 += (float)var7;
-			var1.vertexUV(var20, var13, var15, var18, var10);
-			var1.vertexUV(var20, var13, var14, var18, var9);
-			var1.vertexUV(var16, var13, var14, var8, var9);
-			var1.vertexUV(var16, var13, var15, var8, var10);
-		} else if(var5 == 1) {
-			var16 += (float)var7;
-			var1.vertexUV(var16, var17, var15, var8, var10);
-			var1.vertexUV(var16, var17, var14, var8, var9);
-			var1.vertexUV(var20, var17, var14, var18, var9);
-			var1.vertexUV(var20, var17, var15, var18, var10);
-		} else if(var5 == 2) {
-			var16 += (float)var7;
-			var1.vertexUV(var20, var17, var14, var8, var9);
-			var1.vertexUV(var16, var17, var14, var18, var9);
-			var1.vertexUV(var16, var13, var14, var18, var10);
-			var1.vertexUV(var20, var13, var14, var8, var10);
-		} else if(var5 == 3) {
-			var16 += (float)var7;
-			var1.vertexUV(var20, var17, var15, var18, var9);
-			var1.vertexUV(var20, var13, var15, var18, var10);
-			var1.vertexUV(var16, var13, var15, var8, var10);
-			var1.vertexUV(var16, var17, var15, var8, var9);
-		} else if(var5 == 4) {
-			var15 += (float)var7;
-			var1.vertexUV(var20, var17, var15, var8, var9);
-			var1.vertexUV(var20, var17, var14, var18, var9);
-			var1.vertexUV(var20, var13, var14, var18, var10);
-			var1.vertexUV(var20, var13, var15, var8, var10);
-		} else {
-			if(var5 == 5) {
-				var15 += (float)var7;
-				var1.vertexUV(var16, var13, var15, var18, var10);
-				var1.vertexUV(var16, var13, var14, var8, var10);
-				var1.vertexUV(var16, var17, var14, var8, var9);
-				var1.vertexUV(var16, var17, var15, var18, var9);
-			}
-
+			var1.vertexUV(var14, var18, var13, var9, var11);
+			var1.vertexUV(var14, var18, var12, var17, var11);
+			var1.vertexUV(var14, var15, var12, var17, var10);
+			var1.vertexUV(var14, var15, var13, var9, var10);
 		}
 	}
 
@@ -360,8 +271,12 @@ public class Tile {
 
 	}
 
+	public final AABB getAABB(int var1, int var2, int var3) {
+		return new AABB((float)var1 + this.xx0, (float)var2 + this.yy0, (float)var3 + this.zz0, (float)var1 + this.xx1, (float)var2 + this.yy1, (float)var3 + this.zz1);
+	}
+
 	public AABB getTileAABB(int var1, int var2, int var3) {
-		return new AABB((float)var1, (float)var2, (float)var3, (float)(var1 + 1), (float)(var2 + 1), (float)(var3 + 1));
+		return new AABB((float)var1 + this.xx0, (float)var2 + this.yy0, (float)var3 + this.zz0, (float)var1 + this.xx1, (float)var2 + this.yy1, (float)var3 + this.zz1);
 	}
 
 	public boolean blocksLight() {
@@ -375,14 +290,14 @@ public class Tile {
 	public void tick(Level var1, int var2, int var3, int var4, Random var5) {
 	}
 
-	public final void destroy(Level var1, int var2, int var3, int var4, ParticleEngine var5) {
+	public void destroy(Level var1, int var2, int var3, int var4, ParticleEngine var5) {
 		for(int var6 = 0; var6 < 4; ++var6) {
 			for(int var7 = 0; var7 < 4; ++var7) {
 				for(int var8 = 0; var8 < 4; ++var8) {
 					float var9 = (float)var2 + ((float)var6 + 0.5F) / (float)4;
 					float var10 = (float)var3 + ((float)var7 + 0.5F) / (float)4;
 					float var11 = (float)var4 + ((float)var8 + 0.5F) / (float)4;
-					var5.addParticle(new Particle(var1, var9, var10, var11, var9 - (float)var2 - 0.5F, var10 - (float)var3 - 0.5F, var11 - (float)var4 - 0.5F, this));
+					var5.addParticle(new TerrainParticle(var1, var9, var10, var11, var9 - (float)var2 - 0.5F, var10 - (float)var3 - 0.5F, var11 - (float)var4 - 0.5F, this));
 				}
 			}
 		}
@@ -391,34 +306,34 @@ public class Tile {
 
 	public final void destroy(Level var1, int var2, int var3, int var4, int var5, ParticleEngine var6) {
 		float var7 = 0.1F;
-		float var8 = (float)var2 + random.nextFloat() * (1.0F - var7 * 2.0F) + var7;
-		float var9 = (float)var3 + random.nextFloat() * (1.0F - var7 * 2.0F) + var7;
-		float var10 = (float)var4 + random.nextFloat() * (1.0F - var7 * 2.0F) + var7;
+		float var8 = (float)var2 + random.nextFloat() * (this.xx1 - this.xx0 - var7 * 2.0F) + var7 + this.xx0;
+		float var9 = (float)var3 + random.nextFloat() * (this.yy1 - this.yy0 - var7 * 2.0F) + var7 + this.yy0;
+		float var10 = (float)var4 + random.nextFloat() * (this.zz1 - this.zz0 - var7 * 2.0F) + var7 + this.zz0;
 		if(var5 == 0) {
-			var9 = (float)var3 - var7;
+			var9 = (float)var3 + this.yy0 - var7;
 		}
 
 		if(var5 == 1) {
-			var9 = (float)(var3 + 1) + var7;
+			var9 = (float)var3 + this.yy1 + var7;
 		}
 
 		if(var5 == 2) {
-			var10 = (float)var4 - var7;
+			var10 = (float)var4 + this.zz0 - var7;
 		}
 
 		if(var5 == 3) {
-			var10 = (float)(var4 + 1) + var7;
+			var10 = (float)var4 + this.zz1 + var7;
 		}
 
 		if(var5 == 4) {
-			var8 = (float)var2 - var7;
+			var8 = (float)var2 + this.xx0 - var7;
 		}
 
 		if(var5 == 5) {
-			var8 = (float)(var2 + 1) + var7;
+			var8 = (float)var2 + this.xx1 + var7;
 		}
 
-		var6.addParticle((new Particle(var1, var8, var9, var10, 0.0F, 0.0F, 0.0F, this)).setPower(0.2F).scale(0.6F));
+		var6.addParticle((new TerrainParticle(var1, var8, var9, var10, 0.0F, 0.0F, 0.0F, this)).setPower(0.2F).scale(0.6F));
 	}
 
 	public Liquid getLiquidType() {
@@ -454,22 +369,24 @@ public class Tile {
 	}
 
 	public void spawnResources(Level var1, int var2, int var3, int var4) {
-		this.wasExploded(var1, var2, var3, var4, 1.0F);
+		this.spawnResources(var1, var2, var3, var4, 1.0F);
 	}
 
-	public void wasExploded(Level var1, int var2, int var3, int var4, float var5) {
-		int var6 = this.resourceCount();
+	public void spawnResources(Level var1, int var2, int var3, int var4, float var5) {
+		if(!var1.creativeMode) {
+			int var6 = this.resourceCount();
 
-		for(int var7 = 0; var7 < var6; ++var7) {
-			if(random.nextFloat() <= var5) {
-				float var8 = 0.7F;
-				float var9 = random.nextFloat() * var8 + (1.0F - var8) * 0.5F;
-				float var10 = random.nextFloat() * var8 + (1.0F - var8) * 0.5F;
-				var8 = random.nextFloat() * var8 + (1.0F - var8) * 0.5F;
-				var1.addEntity(new Item(var1, (float)var2 + var9, (float)var3 + var10, (float)var4 + var8, this.getId()));
+			for(int var7 = 0; var7 < var6; ++var7) {
+				if(random.nextFloat() <= var5) {
+					float var8 = 0.7F;
+					float var9 = random.nextFloat() * var8 + (1.0F - var8) * 0.5F;
+					float var10 = random.nextFloat() * var8 + (1.0F - var8) * 0.5F;
+					var8 = random.nextFloat() * var8 + (1.0F - var8) * 0.5F;
+					var1.addEntity(new Item(var1, (float)var2 + var9, (float)var3 + var10, (float)var4 + var8, this.getId()));
+				}
 			}
-		}
 
+		}
 	}
 
 	public void renderGuiTile(Tesselator var1) {
@@ -504,6 +421,274 @@ public class Tile {
 		}
 
 		var1.end();
+	}
+
+	public final boolean isExplodeable() {
+		return this.explodeable;
+	}
+
+	public final HitResult clip(int var1, int var2, int var3, Vec3 var4, Vec3 var5) {
+		var4 = var4.add((float)(-var1), (float)(-var2), (float)(-var3));
+		var5 = var5.add((float)(-var1), (float)(-var2), (float)(-var3));
+		Vec3 var6 = var4.clipX(var5, this.xx0);
+		Vec3 var7 = var4.clipX(var5, this.xx1);
+		Vec3 var8 = var4.clipY(var5, this.yy0);
+		Vec3 var9 = var4.clipY(var5, this.yy1);
+		Vec3 var10 = var4.clipZ(var5, this.zz0);
+		var5 = var4.clipZ(var5, this.zz1);
+		if(!this.containsX(var6)) {
+			var6 = null;
+		}
+
+		if(!this.containsX(var7)) {
+			var7 = null;
+		}
+
+		if(!this.containsY(var8)) {
+			var8 = null;
+		}
+
+		if(!this.containsY(var9)) {
+			var9 = null;
+		}
+
+		if(!this.containsZ(var10)) {
+			var10 = null;
+		}
+
+		if(!this.containsZ(var5)) {
+			var5 = null;
+		}
+
+		Vec3 var11 = null;
+		if(var6 != null) {
+			var11 = var6;
+		}
+
+		if(var7 != null && (var11 == null || var4.distanceTo(var7) < var4.distanceTo(var11))) {
+			var11 = var7;
+		}
+
+		if(var8 != null && (var11 == null || var4.distanceTo(var8) < var4.distanceTo(var11))) {
+			var11 = var8;
+		}
+
+		if(var9 != null && (var11 == null || var4.distanceTo(var9) < var4.distanceTo(var11))) {
+			var11 = var9;
+		}
+
+		if(var10 != null && (var11 == null || var4.distanceTo(var10) < var4.distanceTo(var11))) {
+			var11 = var10;
+		}
+
+		if(var5 != null && (var11 == null || var4.distanceTo(var5) < var4.distanceTo(var11))) {
+			var11 = var5;
+		}
+
+		if(var11 == null) {
+			return null;
+		} else {
+			byte var12 = -1;
+			if(var11 == var6) {
+				var12 = 4;
+			}
+
+			if(var11 == var7) {
+				var12 = 5;
+			}
+
+			if(var11 == var8) {
+				var12 = 0;
+			}
+
+			if(var11 == var9) {
+				var12 = 1;
+			}
+
+			if(var11 == var10) {
+				var12 = 2;
+			}
+
+			if(var11 == var5) {
+				var12 = 3;
+			}
+
+			return new HitResult(var1, var2, var3, var12, var11.add((float)var1, (float)var2, (float)var3));
+		}
+	}
+
+	private boolean containsX(Vec3 var1) {
+		return var1 == null ? false : var1.y >= this.yy0 && var1.y <= this.yy1 && var1.z >= this.zz0 && var1.z <= this.zz1;
+	}
+
+	private boolean containsY(Vec3 var1) {
+		return var1 == null ? false : var1.x >= this.xx0 && var1.x <= this.xx1 && var1.z >= this.zz0 && var1.z <= this.zz1;
+	}
+
+	private boolean containsZ(Vec3 var1) {
+		return var1 == null ? false : var1.x >= this.xx0 && var1.x <= this.xx1 && var1.y >= this.yy0 && var1.y <= this.yy1;
+	}
+
+	public void wasExploded(Level var1, int var2, int var3, int var4) {
+	}
+
+	public boolean render(Level var1, int var2, int var3, int var4, Tesselator var5) {
+		boolean var6 = false;
+		float var7 = 0.5F;
+		float var8 = 0.8F;
+		float var9 = 0.6F;
+		float var10;
+		if(this.shouldRenderFace(var1, var2, var3 - 1, var4, 0)) {
+			var10 = this.getBrightness(var1, var2, var3 - 1, var4);
+			var5.color(var7 * var10, var7 * var10, var7 * var10);
+			this.renderFace(var5, var2, var3, var4, 0);
+			var6 = true;
+		}
+
+		if(this.shouldRenderFace(var1, var2, var3 + 1, var4, 1)) {
+			var10 = this.getBrightness(var1, var2, var3 + 1, var4);
+			var5.color(var10 * 1.0F, var10 * 1.0F, var10 * 1.0F);
+			this.renderFace(var5, var2, var3, var4, 1);
+			var6 = true;
+		}
+
+		if(this.shouldRenderFace(var1, var2, var3, var4 - 1, 2)) {
+			var10 = this.getBrightness(var1, var2, var3, var4 - 1);
+			var5.color(var8 * var10, var8 * var10, var8 * var10);
+			this.renderFace(var5, var2, var3, var4, 2);
+			var6 = true;
+		}
+
+		if(this.shouldRenderFace(var1, var2, var3, var4 + 1, 3)) {
+			var10 = this.getBrightness(var1, var2, var3, var4 + 1);
+			var5.color(var8 * var10, var8 * var10, var8 * var10);
+			this.renderFace(var5, var2, var3, var4, 3);
+			var6 = true;
+		}
+
+		if(this.shouldRenderFace(var1, var2 - 1, var3, var4, 4)) {
+			var10 = this.getBrightness(var1, var2 - 1, var3, var4);
+			var5.color(var9 * var10, var9 * var10, var9 * var10);
+			this.renderFace(var5, var2, var3, var4, 4);
+			var6 = true;
+		}
+
+		if(this.shouldRenderFace(var1, var2 + 1, var3, var4, 5)) {
+			var10 = this.getBrightness(var1, var2 + 1, var3, var4);
+			var5.color(var9 * var10, var9 * var10, var9 * var10);
+			this.renderFace(var5, var2, var3, var4, 5);
+			var6 = true;
+		}
+
+		return var6;
+	}
+
+	public int getRenderLayer() {
+		return 0;
+	}
+
+	static {
+		Tile var10000 = (new StoneTile(1, 1)).setSoundAndGravity(Tile.SoundType.stone, 1.0F, 1.0F, 1.0F);
+		boolean var0 = false;
+		Tile var1 = var10000;
+		var1.explodeable = false;
+		rock = var1;
+		grass = (new GrassTile(2)).setSoundAndGravity(Tile.SoundType.grass, 0.9F, 1.0F, 0.6F);
+		dirt = (new DirtTile(3, 2)).setSoundAndGravity(Tile.SoundType.grass, 0.8F, 1.0F, 0.5F);
+		var10000 = (new Tile(4, 16)).setSoundAndGravity(Tile.SoundType.stone, 1.0F, 1.0F, 1.5F);
+		var0 = false;
+		var1 = var10000;
+		var1.explodeable = false;
+		stoneBrick = var1;
+		wood = (new Tile(5, 4)).setSoundAndGravity(Tile.SoundType.wood, 1.0F, 1.0F, 1.5F);
+		bush = (new Bush(6, 15)).setSoundAndGravity(Tile.SoundType.none, 0.7F, 1.0F, 0.0F);
+		var10000 = (new Tile(7, 17)).setSoundAndGravity(Tile.SoundType.stone, 1.0F, 1.0F, 999.0F);
+		var0 = false;
+		var1 = var10000;
+		var1.explodeable = false;
+		unbreakable = var1;
+		water = (new LiquidTile(8, Liquid.water)).setSoundAndGravity(Tile.SoundType.none, 1.0F, 1.0F, 100.0F);
+		calmWater = (new CalmLiquidTile(9, Liquid.water)).setSoundAndGravity(Tile.SoundType.none, 1.0F, 1.0F, 100.0F);
+		lava = (new LiquidTile(10, Liquid.lava)).setSoundAndGravity(Tile.SoundType.none, 1.0F, 1.0F, 100.0F);
+		calmLava = (new CalmLiquidTile(11, Liquid.lava)).setSoundAndGravity(Tile.SoundType.none, 1.0F, 1.0F, 100.0F);
+		sand = (new FallingTile(12, 18)).setSoundAndGravity(Tile.SoundType.gravel, 0.8F, 1.0F, 0.5F);
+		gravel = (new FallingTile(13, 19)).setSoundAndGravity(Tile.SoundType.gravel, 0.8F, 1.0F, 0.6F);
+		var10000 = (new OreTile(14, 32)).setSoundAndGravity(Tile.SoundType.stone, 1.0F, 1.0F, 3.0F);
+		var0 = false;
+		var1 = var10000;
+		var1.explodeable = false;
+		goldOre = var1;
+		var10000 = (new OreTile(15, 33)).setSoundAndGravity(Tile.SoundType.stone, 1.0F, 1.0F, 3.0F);
+		var0 = false;
+		var1 = var10000;
+		var1.explodeable = false;
+		ironOre = var1;
+		var10000 = (new OreTile(16, 34)).setSoundAndGravity(Tile.SoundType.stone, 1.0F, 1.0F, 3.0F);
+		var0 = false;
+		var1 = var10000;
+		var1.explodeable = false;
+		coalOre = var1;
+		log = (new LogTile(17)).setSoundAndGravity(Tile.SoundType.wood, 1.0F, 1.0F, 2.5F);
+		leaf = (new LeafTile(18, 22)).setSoundAndGravity(Tile.SoundType.grass, 1.0F, 0.4F, 0.2F);
+		sponge = (new SpongeTile(19)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 0.9F, 0.6F);
+		glass = (new GlassTile(20, 49, false)).setSoundAndGravity(Tile.SoundType.metal, 1.0F, 1.0F, 0.3F);
+		clothRed = (new Tile(21, 64)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
+		clothOrange = (new Tile(22, 65)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
+		clothYellow = (new Tile(23, 66)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
+		clothChartreuse = (new Tile(24, 67)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
+		clothGreen = (new Tile(25, 68)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
+		clothSpringGreen = (new Tile(26, 69)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
+		clothCyan = (new Tile(27, 70)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
+		clothCapri = (new Tile(28, 71)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
+		clothUltramarine = (new Tile(29, 72)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
+		clothViolet = (new Tile(30, 73)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
+		clothPurple = (new Tile(31, 74)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
+		clothMagenta = (new Tile(32, 75)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
+		clothRose = (new Tile(33, 76)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
+		clothDarkGray = (new Tile(34, 77)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
+		clothGray = (new Tile(35, 78)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
+		clothWhite = (new Tile(36, 79)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.8F);
+		flower = (new Flower(37, 13)).setSoundAndGravity(Tile.SoundType.none, 0.7F, 1.0F, 0.0F);
+		rose = (new Flower(38, 12)).setSoundAndGravity(Tile.SoundType.none, 0.7F, 1.0F, 0.0F);
+		mushroom1 = (new Mushroom(39, 29)).setSoundAndGravity(Tile.SoundType.none, 0.7F, 1.0F, 0.0F);
+		mushroom2 = (new Mushroom(40, 28)).setSoundAndGravity(Tile.SoundType.none, 0.7F, 1.0F, 0.0F);
+		var10000 = (new MetalTile(41, 40)).setSoundAndGravity(Tile.SoundType.metal, 0.7F, 1.0F, 3.0F);
+		var0 = false;
+		var1 = var10000;
+		var1.explodeable = false;
+		gold = var1;
+		var10000 = (new MetalTile(42, 39)).setSoundAndGravity(Tile.SoundType.metal, 0.7F, 1.0F, 5.0F);
+		var0 = false;
+		var1 = var10000;
+		var1.explodeable = false;
+		iron = var1;
+		var10000 = (new SlabTile(43, true)).setSoundAndGravity(Tile.SoundType.stone, 1.0F, 1.0F, 2.0F);
+		var0 = false;
+		var1 = var10000;
+		var1.explodeable = false;
+		slabFull = var1;
+		var10000 = (new SlabTile(44, false)).setSoundAndGravity(Tile.SoundType.stone, 1.0F, 1.0F, 2.0F);
+		var0 = false;
+		var1 = var10000;
+		var1.explodeable = false;
+		slabHalf = var1;
+		var10000 = (new Tile(45, 7)).setSoundAndGravity(Tile.SoundType.stone, 1.0F, 1.0F, 2.0F);
+		var0 = false;
+		var1 = var10000;
+		var1.explodeable = false;
+		brick = var1;
+		tnt = (new TntTile(46, 8)).setSoundAndGravity(Tile.SoundType.cloth, 1.0F, 1.0F, 0.0F);
+		bookshelf = (new BookshelfTile(47, 35)).setSoundAndGravity(Tile.SoundType.wood, 1.0F, 1.0F, 1.5F);
+		var10000 = (new Tile(48, 36)).setSoundAndGravity(Tile.SoundType.stone, 1.0F, 1.0F, 1.0F);
+		var0 = false;
+		var1 = var10000;
+		var1.explodeable = false;
+		mossStone = var1;
+		var10000 = (new StoneTile(49, 37)).setSoundAndGravity(Tile.SoundType.stone, 1.0F, 1.0F, 10.0F);
+		var0 = false;
+		var1 = var10000;
+		var1.explodeable = false;
+		obsidian = var1;
 	}
 
 	public static enum SoundType {

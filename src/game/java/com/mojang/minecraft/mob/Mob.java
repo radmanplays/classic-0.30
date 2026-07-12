@@ -7,6 +7,8 @@ import com.mojang.minecraft.mob.ai.BasicAI;
 import com.mojang.minecraft.model.BaseModel;
 import com.mojang.minecraft.model.ModelCache;
 import com.mojang.minecraft.renderer.Textures;
+import com.mojang.util.Mth;
+
 import org.lwjgl.opengl.GL11;
 
 public class Mob extends Entity {
@@ -14,7 +16,7 @@ public class Mob extends Entity {
 	public static final int ATTACK_DURATION = 5;
 	public static final int TOTAL_AIR_SUPPLY = 300;
 	public static ModelCache modelCache;
-	public int invulnerableDuration = 30;
+	public int invulnerableDuration = 20;
 	public float rot;
 	public float timeOffs;
 	public float speed;
@@ -31,6 +33,9 @@ public class Mob extends Entity {
 	public boolean allowAlpha = true;
 	public float rotOffs = 0.0F;
 	public String modelName = null;
+	protected float bobStrength = 1.0F;
+	protected int deathScore = 0;
+	public float renderOffset = 0.0F;
 	public int health = 20;
 	public int lastHealth;
 	public int invulnerableTime = 0;
@@ -49,9 +54,10 @@ public class Mob extends Entity {
 		super(var1);
 		this.setPos(this.x, this.y, this.z);
 		this.timeOffs = (float)Math.random() * 12398.0F;
-		this.rot = (float)(Math.random() * Math.PI * 2.0D);
+		this.rot = (float)(Math.random() * (double)((float)Math.PI) * 2.0D);
 		this.speed = 1.0F;
 		this.ai = new BasicAI();
+		this.footSize = 0.5F;
 	}
 
 	public boolean isPickable() {
@@ -114,7 +120,7 @@ public class Mob extends Entity {
 		this.aiStep();
 		float var1 = this.x - this.xo;
 		float var2 = this.z - this.zo;
-		float var3 = (float)Math.sqrt((double)(var1 * var1 + var2 * var2));
+		float var3 = Mth.sqrt_float(var1 * var1 + var2 * var2);
 		float var4 = this.yBodyRot;
 		float var5 = 0.0F;
 		this.oRun = this.run;
@@ -197,7 +203,8 @@ public class Mob extends Entity {
 	}
 
 	protected void bindTexture(Textures var1) {
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, var1.loadTexture(this.textureName));
+		this.textureId = var1.loadTexture(this.textureName);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.textureId);
 	}
 
 	public void render(Textures var1, float var2) {
@@ -215,8 +222,8 @@ public class Mob extends Entity {
 				this.yBodyRotO -= 360.0F;
 			}
 
-			float var4;
-			for(var4 = this.yBodyRotO + (this.yBodyRot - this.yBodyRotO) * var2; this.xRotO - this.xRot < -180.0F; this.xRotO += 360.0F) {
+			while(this.xRotO - this.xRot < -180.0F) {
+				this.xRotO += 360.0F;
 			}
 
 			while(this.xRotO - this.xRot >= 180.0F) {
@@ -231,8 +238,8 @@ public class Mob extends Entity {
 				this.yRotO -= 360.0F;
 			}
 
+			float var4 = this.yBodyRotO + (this.yBodyRot - this.yBodyRotO) * var2;
 			float var5 = this.oRun + (this.run - this.oRun) * var2;
-			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			float var6 = this.yRotO + (this.yRot - this.yRotO) * var2;
 			float var7 = this.xRotO + (this.xRot - this.xRotO) * var2;
 			var6 -= var4;
@@ -241,15 +248,15 @@ public class Mob extends Entity {
 			float var9 = this.getBrightness(var2);
 			GL11.glColor3f(var9, var9, var9);
 			var9 = 1.0F / 16.0F;
-			float var10 = (float)(-Math.abs(Math.cos((double)var8 * 0.6662D)) * 5.0D * (double)var5 - 23.0D);
-			GL11.glTranslatef(this.xo + (this.x - this.xo) * var2, this.yo + (this.y - this.yo) * var2 - 1.62F, this.zo + (this.z - this.zo) * var2);
+			float var10 = -Math.abs(Mth.cos(var8 * 0.6662F)) * 5.0F * var5 * this.bobStrength - 23.0F;
+			GL11.glTranslatef(this.xo + (this.x - this.xo) * var2, this.yo + (this.y - this.yo) * var2 - 1.62F + this.renderOffset, this.zo + (this.z - this.zo) * var2);
 			float var11 = (float)this.hurtTime - var2;
 			if(var11 > 0.0F || this.health <= 0) {
 				if(var11 < 0.0F) {
 					var11 = 0.0F;
 				} else {
 					var11 /= (float)this.hurtDuration;
-					var11 = (float)Math.sin((double)(var11 * var11 * var11 * var11) * Math.PI) * 14.0F;
+					var11 = Mth.sin(var11 * var11 * var11 * var11 * (float)Math.PI) * 14.0F;
 				}
 
 				float var12 = 0.0F;
@@ -270,8 +277,8 @@ public class Mob extends Entity {
 				GL11.glRotatef(-(180.0F - var4 + this.rotOffs), 0.0F, 1.0F, 0.0F);
 			}
 
+			GL11.glTranslatef(0.0F, -var10 * var9, 0.0F);
 			GL11.glScalef(1.0F, -1.0F, 1.0F);
-			GL11.glTranslatef(0.0F, var10 * var9, 0.0F);
 			GL11.glRotatef(180.0F - var4 + this.rotOffs, 0.0F, 1.0F, 0.0F);
 			if(!this.allowAlpha) {
 				GL11.glDisable(GL11.GL_ALPHA_TEST);
@@ -281,10 +288,10 @@ public class Mob extends Entity {
 				GL11.glDisable(GL11.GL_CULL_FACE);
 			}
 
+
 			GL11.glScalef(-1.0F, 1.0F, 1.0F);
 			BaseModel var13 = modelCache.getModel(this.modelName);
 			var13.rot = var3 / 5.0F;
-			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			this.bindTexture(var1);
 			this.renderModel(var1, var8, var2, var5, var6, var7, var9);
 			if(this.invulnerableTime > this.invulnerableDuration - 10) {
@@ -297,14 +304,12 @@ public class Mob extends Entity {
 				GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 			}
 
-			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			GL11.glEnable(GL11.GL_ALPHA_TEST);
 			if(this.allowAlpha) {
 				GL11.glEnable(GL11.GL_CULL_FACE);
 			}
 
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			GL11.glPopMatrix();
 		}
 	}
@@ -326,40 +331,42 @@ public class Mob extends Entity {
 	}
 
 	public void hurt(Entity var1, int var2) {
-		if(this.health > 0) {
-			this.ai.hurt(var1, var2);
-			if((float)this.invulnerableTime > (float)this.invulnerableDuration / 2.0F) {
-				if(this.lastHealth - var2 >= this.health) {
-					return;
+		if(!this.level.creativeMode) {
+			if(this.health > 0) {
+				this.ai.hurt(var1, var2);
+				if((float)this.invulnerableTime > (float)this.invulnerableDuration / 2.0F) {
+					if(this.lastHealth - var2 >= this.health) {
+						return;
+					}
+
+					this.health = this.lastHealth - var2;
+				} else {
+					this.lastHealth = this.health;
+					this.invulnerableTime = this.invulnerableDuration;
+					this.health -= var2;
+					this.hurtTime = this.hurtDuration = 10;
 				}
 
-				this.health = this.lastHealth - var2;
-			} else {
-				this.lastHealth = this.health;
-				this.invulnerableTime = this.invulnerableDuration;
-				this.health -= var2;
-				this.hurtTime = this.hurtDuration = 10;
-			}
+				this.hurtDir = 0.0F;
+				if(var1 != null) {
+					float var3 = var1.x - this.x;
+					float var4 = var1.z - this.z;
+					this.hurtDir = (float)(Math.atan2((double)var4, (double)var3) * 180.0D / (double)((float)Math.PI)) - this.yRot;
+					this.knockback(var1, var2, var3, var4);
+				} else {
+					this.hurtDir = (float)((int)(Math.random() * 2.0D) * 180);
+				}
 
-			this.hurtDir = 0.0F;
-			if(var1 != null) {
-				float var3 = var1.x - this.x;
-				float var4 = var1.z - this.z;
-				this.hurtDir = (float)(Math.atan2((double)var4, (double)var3) * 180.0D / Math.PI) - this.yRot;
-				this.knockback(var1, var2, var3, var4);
-			} else {
-				this.hurtDir = (float)((int)(Math.random() * 2.0D) * 180);
-			}
+				if(this.health <= 0) {
+					this.die(var1);
+				}
 
-			if(this.health <= 0) {
-				this.die(var1);
 			}
-
 		}
 	}
 
 	public void knockback(Entity var1, int var2, float var3, float var4) {
-		float var5 = (float)Math.sqrt((double)(var3 * var3 + var4 * var4));
+		float var5 = Mth.sqrt_float(var3 * var3 + var4 * var4);
 		float var6 = 0.4F;
 		this.xd /= 2.0F;
 		this.yd /= 2.0F;
@@ -374,15 +381,23 @@ public class Mob extends Entity {
 	}
 
 	public void die(Entity var1) {
-		this.dead = true;
+		if(!this.level.creativeMode) {
+			if(this.deathScore > 0 && var1 != null) {
+				var1.awardKillScore(this, this.deathScore);
+			}
+
+			this.dead = true;
+		}
 	}
 
 	protected void causeFallDamage(float var1) {
-		int var2 = (int)Math.ceil((double)(var1 - 3.0F));
-		if(var2 > 0) {
-			this.hurt((Entity)null, var2);
-		}
+		if(!this.level.creativeMode) {
+			int var2 = (int)Math.ceil((double)(var1 - 3.0F));
+			if(var2 > 0) {
+				this.hurt((Entity)null, var2);
+			}
 
+		}
 	}
 
 	public void travel(float var1, float var2) {

@@ -25,7 +25,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.mojang.util.MathHelper;
+import com.mojang.util.Mth;
 
 import net.lax1dude.eaglercraft.internal.buffer.ByteBuffer;
 import net.lax1dude.eaglercraft.internal.buffer.FloatBuffer;
@@ -894,7 +894,7 @@ public class FixedFunctionPipeline {
 					float x = GlStateManager.stateNormalX;
 					float y = GlStateManager.stateNormalY;
 					float z = GlStateManager.stateNormalZ;
-					float c = 1.0f / MathHelper.sqrt_float(x * x + y * y + z * z);
+					float c = 1.0f / Mth.sqrt_float(x * x + y * y + z * z);
 					x *= c;
 					y *= c;
 					z *= c;

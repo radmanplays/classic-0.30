@@ -1,5 +1,9 @@
 package com.mojang.minecraft.model;
 
+import org.lwjgl.opengl.GL11;
+
+import com.mojang.util.Mth;
+
 public class HumanoidModel extends BaseModel {
 	public Cube head;
 	public Cube hair;
@@ -37,6 +41,9 @@ public class HumanoidModel extends BaseModel {
 	}
 
 	public final void render(float var1, float var2, float var3, float var4, float var5, float var6) {
+		GL11.glEnable(GL11.GL_ALPHA_TEST);
+		GL11.glAlphaFunc(GL11.GL_GREATER, 0.1f);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		this.setupAnim(var1, var2, var3, var4, var5, var6);
 		this.head.render(var6);
 		this.body.render(var6);
@@ -47,17 +54,17 @@ public class HumanoidModel extends BaseModel {
 	}
 
 	public void setupAnim(float var1, float var2, float var3, float var4, float var5, float var6) {
-		this.head.yRot = var4 / 57.29578F;
-		this.head.xRot = var5 / 57.29578F;
-		this.rightArm.xRot = (float)Math.cos((double)var1 * 0.6662D + Math.PI) * 2.0F * var2;
-		this.rightArm.zRot = (float)(Math.cos((double)var1 * 0.2312D) + 1.0D) * var2;
-		this.leftArm.xRot = (float)Math.cos((double)var1 * 0.6662D) * 2.0F * var2;
-		this.leftArm.zRot = (float)(Math.cos((double)var1 * 0.2812D) - 1.0D) * var2;
-		this.rightLeg.xRot = (float)Math.cos((double)var1 * 0.6662D) * 1.4F * var2;
-		this.leftLeg.xRot = (float)Math.cos((double)var1 * 0.6662D + Math.PI) * 1.4F * var2;
-		this.rightArm.zRot += (float)Math.cos((double)var3 * 0.09D) * 0.05F + 0.05F;
-		this.leftArm.zRot -= (float)Math.cos((double)var3 * 0.09D) * 0.05F + 0.05F;
-		this.rightArm.xRot += (float)Math.sin((double)var3 * 0.067D) * 0.05F;
-		this.leftArm.xRot -= (float)Math.sin((double)var3 * 0.067D) * 0.05F;
+		this.head.yRot = var4 / (180.0F / (float)Math.PI);
+		this.head.xRot = var5 / (180.0F / (float)Math.PI);
+		this.rightArm.xRot = Mth.cos(var1 * 0.6662F + (float)Math.PI) * 2.0F * var2;
+		this.rightArm.zRot = (Mth.cos(var1 * 0.2312F) + 1.0F) * var2;
+		this.leftArm.xRot = Mth.cos(var1 * 0.6662F) * 2.0F * var2;
+		this.leftArm.zRot = (Mth.cos(var1 * 0.2812F) - 1.0F) * var2;
+		this.rightLeg.xRot = Mth.cos(var1 * 0.6662F) * 1.4F * var2;
+		this.leftLeg.xRot = Mth.cos(var1 * 0.6662F + (float)Math.PI) * 1.4F * var2;
+		this.rightArm.zRot += Mth.cos(var3 * 0.09F) * 0.05F + 0.05F;
+		this.leftArm.zRot -= Mth.cos(var3 * 0.09F) * 0.05F + 0.05F;
+		this.rightArm.xRot += Mth.sin(var3 * 0.067F) * 0.05F;
+		this.leftArm.xRot -= Mth.sin(var3 * 0.067F) * 0.05F;
 	}
 }

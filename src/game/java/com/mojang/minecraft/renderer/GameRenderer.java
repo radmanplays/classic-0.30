@@ -1,5 +1,6 @@
 package com.mojang.minecraft.renderer;
 
+import com.mojang.minecraft.Entity;
 import com.mojang.minecraft.Minecraft;
 import com.mojang.minecraft.level.Level;
 import com.mojang.minecraft.level.liquid.Liquid;
@@ -9,8 +10,10 @@ import com.mojang.minecraft.player.Player;
 
 import org.lwjgl.opengl.GL11;
 import com.mojang.util.GLAllocation;
+import com.mojang.util.Mth;
 import com.mojang.util.Vec3D_112;
 
+import net.lax1dude.eaglercraft.Random;
 import net.lax1dude.eaglercraft.internal.buffer.FloatBuffer;
 import net.lax1dude.eaglercraft.opengl.GlStateManager;
 
@@ -20,6 +23,9 @@ public final class GameRenderer {
 	public boolean displayActive = false;
 	public float renderDistance = 0.0F;
 	public TileRenderer tileRenderer;
+	public int rainTicks;
+	public Entity entity = null;
+	public Random random = new Random();
 	private volatile int unusedInt1 = 0;
 	private volatile int unusedInt2 = 0;
 	private FloatBuffer lb = GLAllocation.createFloatBuffer(16);
@@ -37,6 +43,14 @@ public final class GameRenderer {
 		this.minecraft = var1;
 		this.tileRenderer = new TileRenderer(var1);
 	}
+	
+	public Vec3 getPlayerRotVec(float var1) {
+		Player var4 = this.minecraft.player;
+		float var2 = var4.xo + (var4.x - var4.xo) * var1;
+		float var3 = var4.yo + (var4.y - var4.yo) * var1;
+		float var5 = var4.zo + (var4.z - var4.zo) * var1;
+		return new Vec3(var2, var3, var5);
+	}
 
 	public void renderHurtFrames(float var1) {
 		Player var3 = this.minecraft.player;
@@ -48,7 +62,7 @@ public final class GameRenderer {
 
 		if(var2 >= 0.0F) {
 			var2 /= (float)var3.hurtDuration;
-			var2 = (float)Math.sin((double)(var2 * var2 * var2 * var2) * Math.PI);
+			var2 = Mth.sin(var2 * var2 * var2 * var2 * (float)Math.PI);
 			var1 = var3.hurtDir;
 			GL11.glRotatef(-var1, 0.0F, 1.0F, 0.0F);
 			GL11.glRotatef(-var2 * 14.0F, 0.0F, 0.0F, 1.0F);
@@ -62,9 +76,9 @@ public final class GameRenderer {
 		var2 = var4.walkDist + var2 * var1;
 		float var3 = var4.oBob + (var4.bob - var4.oBob) * var1;
 		float var5 = var4.oTilt + (var4.tilt - var4.oTilt) * var1;
-		GL11.glTranslatef((float)Math.sin((double)var2 * Math.PI) * var3 * 0.5F, -((float)Math.abs(Math.cos((double)var2 * Math.PI) * (double)var3)), 0.0F);
-		GL11.glRotatef((float)Math.sin((double)var2 * Math.PI) * var3 * 3.0F, 0.0F, 0.0F, 1.0F);
-		GL11.glRotatef((float)Math.abs(Math.cos((double)var2 * Math.PI + (double)0.2F) * (double)var3) * 5.0F, 1.0F, 0.0F, 0.0F);
+		GL11.glTranslatef(Mth.sin(var2 * (float)Math.PI) * var3 * 0.5F, -Math.abs(Mth.cos(var2 * (float)Math.PI) * var3), 0.0F);
+		GL11.glRotatef(Mth.sin(var2 * (float)Math.PI) * var3 * 3.0F, 0.0F, 0.0F, 1.0F);
+		GL11.glRotatef(Math.abs(Mth.cos(var2 * (float)Math.PI + 0.2F) * var3) * 5.0F, 1.0F, 0.0F, 0.0F);
 		GL11.glRotatef(var5, 1.0F, 0.0F, 0.0F);
 	}
 
@@ -83,7 +97,7 @@ public final class GameRenderer {
 		}
 	}
 
-	public final void init() {
+	public final void render() {
 		int var1 = this.minecraft.width * 240 / this.minecraft.height;
 		int var2 = this.minecraft.height * 240 / this.minecraft.height;
 		GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);

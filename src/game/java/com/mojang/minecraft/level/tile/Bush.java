@@ -1,11 +1,13 @@
 package com.mojang.minecraft.level.tile;
 
 import com.mojang.minecraft.level.Level;
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
 public final class Bush extends Flower {
 	protected Bush(int var1, int var2) {
 		super(6, 15);
+		float var3 = 0.4F;
+		this.setShape(0.5F - var3, 0.0F, 0.5F - var3, var3 + 0.5F, var3 * 2.0F, var3 + 0.5F);
 	}
 
 	public final void tick(Level var1, int var2, int var3, int var4, Random var5) {

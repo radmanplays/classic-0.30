@@ -5,6 +5,8 @@ import com.mojang.minecraft.level.Level;
 import com.mojang.minecraft.level.tile.Tile;
 import com.mojang.minecraft.player.Player;
 import com.mojang.minecraft.renderer.Textures;
+import com.mojang.util.Mth;
+
 import org.lwjgl.opengl.GL11;
 
 public class Item extends Entity {
@@ -68,21 +70,22 @@ public class Item extends Entity {
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_ALPHA_TEST);
 		GL11.glAlphaFunc(GL11.GL_GREATER, 0.1f);
-		int var4 = var1.loadTexture("/terrain.png");
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, var4);
+		this.textureId = var1.loadTexture("/terrain.png");
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.textureId);
 		float var5 = this.level.getBrightness((int)this.x, (int)this.y, (int)this.z);
 		float var3 = this.rot + ((float)this.tickCount + var2) * 3.0F;
 		GL11.glPushMatrix();
 		GL11.glColor4f(var5, var5, var5, 1.0F);
-		var5 = (float)Math.sin((double)(var3 / 10.0F)) * 0.1F + 0.1F;
-		GL11.glTranslatef(this.xo + (this.x - this.xo) * var2, this.yo + (this.y - this.yo) * var2 + var5, this.zo + (this.z - this.zo) * var2);
+		var5 = Mth.sin(var3 / 10.0F);
+		float var4 = var5 * 0.1F + 0.1F;
+		GL11.glTranslatef(this.xo + (this.x - this.xo) * var2, this.yo + (this.y - this.yo) * var2 + var4, this.zo + (this.z - this.zo) * var2);
 		GL11.glRotatef(var3, 0.0F, 1.0F, 0.0F);
 		models[this.resource].render();
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		var5 = (float)Math.sin((double)(var3 / 10.0F)) * 0.5F + 0.5F;
+		var5 = var5 * 0.5F + 0.5F;
 		var5 *= var5;
 		var5 *= var5;
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, var5 * 0.4F);
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
 		GL11.glDisable(GL11.GL_ALPHA_TEST);
@@ -92,11 +95,13 @@ public class Item extends Entity {
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		GL11.glPopMatrix();
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
 	}
 
-	public void playerTouch(Player var1) {
-		if(var1.addResource(this.resource)) {
-			this.level.addEntity(new TakeEntityAnim(this.level, this, var1));
+	public void playerTouch(Entity var1) {
+		Player var2 = (Player)var1;
+		if(var2.addResource(this.resource)) {
+			this.level.addEntity(new TakeEntityAnim(this.level, this, var2));
 			this.remove();
 		}
 

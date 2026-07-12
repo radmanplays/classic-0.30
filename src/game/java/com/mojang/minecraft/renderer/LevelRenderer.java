@@ -9,8 +9,10 @@ import com.mojang.util.GLAllocation;
 
 import net.lax1dude.eaglercraft.internal.buffer.IntBuffer;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.lwjgl.opengl.GL11;
 
@@ -19,14 +21,14 @@ public final class LevelRenderer {
 	public Textures textures;
 	public int surroundLists;
 	public IntBuffer ib = GLAllocation.createIntBuffer(65536);
-	public Set allDirtyChunks = new HashSet();
+	public List allDirtyChunks = new ArrayList();
 	private Chunk[] sortedChunks;
 	public Chunk[] chunks;
 	private int xChunks;
 	private int yChunks;
 	private int zChunks;
 	private int glLists;
-	private Minecraft minecraft;
+	public Minecraft minecraft;
 	private int[] chunkBuffer = new int['\uc350'];
 	public int cloudTickCounter = 0;
 	private float lX = -9999.0F;
@@ -38,7 +40,7 @@ public final class LevelRenderer {
 		this.minecraft = var1;
 		this.textures = var2;
 		this.surroundLists = GL11.glGenLists(2);
-		this.glLists = GL11.glGenLists(4096 << 6 << 3);
+		this.glLists = GL11.glGenLists(4096 << 6 << 1);
 	}
 
 	public final void compileSurroundingGround() {
@@ -62,9 +64,13 @@ public final class LevelRenderer {
 				for(var4 = 0; var4 < this.zChunks; ++var4) {
 					this.chunks[(var4 * this.yChunks + var3) * this.xChunks + var2] = new Chunk(this.level, var2 << 4, var3 << 4, var4 << 4, 16, this.glLists + var1);
 					this.sortedChunks[(var4 * this.yChunks + var3) * this.xChunks + var2] = this.chunks[(var4 * this.yChunks + var3) * this.xChunks + var2];
-					var1 += 8;
+					var1 += 2;
 				}
 			}
+		}
+		
+		for(int var2 = 0; var2 < this.allDirtyChunks.size(); ++var2) {
+			((Chunk)this.allDirtyChunks.get(var2)).dirty = false;
 		}
 
 		this.allDirtyChunks.clear();
@@ -299,7 +305,7 @@ public final class LevelRenderer {
 		int var6 = 0;
 
 		for(int var7 = 0; var7 < this.sortedChunks.length; ++var7) {
-			var6 = this.sortedChunks[var7].render(this.chunkBuffer, var6, var2, var1.x, var1.y, var1.z);
+			var6 = this.sortedChunks[var7].render(this.chunkBuffer, var6, var2);
 		}
 
 		this.ib.clear();
@@ -486,7 +492,11 @@ public final class LevelRenderer {
 		for(var1 = var1; var1 <= var4; ++var1) {
 			for(int var7 = var2; var7 <= var5; ++var7) {
 				for(int var8 = var3; var8 <= var6; ++var8) {
-					this.allDirtyChunks.add(this.chunks[(var8 * this.yChunks + var7) * this.xChunks + var1]);
+					Chunk var9 = this.chunks[(var8 * this.yChunks + var7) * this.xChunks + var1];
+					if(!var9.dirty) {
+						var9.dirty = true;
+						this.allDirtyChunks.add(this.chunks[(var8 * this.yChunks + var7) * this.xChunks + var1]);
+					}
 				}
 			}
 		}

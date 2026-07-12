@@ -4,7 +4,7 @@ import com.mojang.minecraft.level.Level;
 import com.mojang.minecraft.level.liquid.Liquid;
 import com.mojang.minecraft.phys.AABB;
 import com.mojang.minecraft.renderer.Tesselator;
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
 public class LiquidTile extends Tile {
 	protected Liquid liquid;
@@ -114,14 +114,10 @@ public class LiquidTile extends Tile {
 		return this.liquid == Liquid.lava ? 100.0F : var1.getBrightness(var2, var3, var4);
 	}
 
-	public final boolean shouldRenderFace(Level var1, int var2, int var3, int var4, int var5, int var6) {
+	public final boolean shouldRenderFace(Level var1, int var2, int var3, int var4, int var5) {
 		if(var2 >= 0 && var3 >= 0 && var4 >= 0 && var2 < var1.width && var4 < var1.height) {
-			if(var5 != 1 && this.liquid == Liquid.water) {
-				return false;
-			} else {
-				var5 = var1.getTile(var2, var3, var4);
-				return var5 != this.tileID && var5 != this.calmTileID ? (var6 != 1 || var1.getTile(var2 - 1, var3, var4) != 0 && var1.getTile(var2 + 1, var3, var4) != 0 && var1.getTile(var2, var3, var4 - 1) != 0 && var1.getTile(var2, var3, var4 + 1) != 0 ? super.shouldRenderFace(var1, var2, var3, var4, -1, var6) : true) : false;
-			}
+			int var6 = var1.getTile(var2, var3, var4);
+			return var6 != this.tileID && var6 != this.calmTileID ? (var5 != 1 || var1.getTile(var2 - 1, var3, var4) != 0 && var1.getTile(var2 + 1, var3, var4) != 0 && var1.getTile(var2, var3, var4 - 1) != 0 && var1.getTile(var2, var3, var4 + 1) != 0 ? super.shouldRenderFace(var1, var2, var3, var4, var5) : true) : false;
 		} else {
 			return false;
 		}
@@ -164,7 +160,7 @@ public class LiquidTile extends Tile {
 		return this.liquid == Liquid.lava ? 5 : 0;
 	}
 
-	public final void wasExploded(Level var1, int var2, int var3, int var4, float var5) {
+	public final void spawnResources(Level var1, int var2, int var3, int var4, float var5) {
 	}
 
 	public final void spawnResources(Level var1, int var2, int var3, int var4) {
@@ -172,5 +168,9 @@ public class LiquidTile extends Tile {
 
 	public final int resourceCount() {
 		return 0;
+	}
+
+	public final int getRenderLayer() {
+		return this.liquid == Liquid.water ? 1 : 0;
 	}
 }

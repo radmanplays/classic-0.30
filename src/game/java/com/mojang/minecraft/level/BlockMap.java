@@ -1,6 +1,7 @@
 package com.mojang.minecraft.level;
 
 import com.mojang.minecraft.Entity;
+import com.mojang.minecraft.model.Vec3;
 import com.mojang.minecraft.phys.AABB;
 import com.mojang.minecraft.renderer.Frustum;
 import com.mojang.minecraft.renderer.Textures;
@@ -102,6 +103,23 @@ public class BlockMap implements Serializable {
 		return var8;
 	}
 
+	public void removeAllNonCreativeModeEntities() {
+		for(int var1 = 0; var1 < this.width; ++var1) {
+			for(int var2 = 0; var2 < this.depth; ++var2) {
+				for(int var3 = 0; var3 < this.height; ++var3) {
+					List var4 = this.entityGrid[(var3 * this.depth + var2) * this.width + var1];
+
+					for(int var5 = 0; var5 < var4.size(); ++var5) {
+						if(!((Entity)var4.get(var5)).isCreativeModeAllowed()) {
+							var4.remove(var5--);
+						}
+					}
+				}
+			}
+		}
+
+	}
+
 	public void clear() {
 		for(int var1 = 0; var1 < this.width; ++var1) {
 			for(int var2 = 0; var2 < this.depth; ++var2) {
@@ -144,27 +162,94 @@ public class BlockMap implements Serializable {
 
 	}
 
-	public void render(Frustum var1, Textures var2, float var3) {
-		for(int var4 = 0; var4 < this.width; ++var4) {
-			float var5 = (float)((var4 << 4) - 2);
-			float var6 = (float)((var4 + 1 << 4) + 2);
+	public void render(Vec3 var1, Frustum var2, Textures var3, float var4) {
+		for(int var5 = 0; var5 < this.width; ++var5) {
+			float var6 = (float)((var5 << 4) - 2);
+			float var7 = (float)((var5 + 1 << 4) + 2);
 
-			for(int var7 = 0; var7 < this.depth; ++var7) {
-				float var8 = (float)((var7 << 4) - 2);
-				float var9 = (float)((var7 + 1 << 4) + 2);
+			for(int var8 = 0; var8 < this.depth; ++var8) {
+				float var9 = (float)((var8 << 4) - 2);
+				float var10 = (float)((var8 + 1 << 4) + 2);
 
-				for(int var10 = 0; var10 < this.height; ++var10) {
-					List var11 = this.entityGrid[(var10 * this.depth + var7) * this.width + var4];
-					if(var11.size() != 0) {
-						float var12 = (float)((var10 << 4) - 2);
-						float var13 = (float)((var10 + 1 << 4) + 2);
-						boolean var14 = var1.cubeInFrustum(var5, var8, var12, var6, var9, var13);
-						boolean var15 = var14 && var1.cubeFullyInFrustrum(var5, var8, var12, var6, var9, var13);
-						if(var14) {
-							for(int var16 = 0; var16 < var11.size(); ++var16) {
-								Entity var17 = (Entity)var11.get(var16);
-								if(var15 || var1.isVisible(var17.bb)) {
-									((Entity)var11.get(var16)).render(var2, var3);
+				for(int var11 = 0; var11 < this.height; ++var11) {
+					List var12 = this.entityGrid[(var11 * this.depth + var8) * this.width + var5];
+					if(var12.size() != 0) {
+						float var13 = (float)((var11 << 4) - 2);
+						float var14 = (float)((var11 + 1 << 4) + 2);
+						boolean var15 = var2.cubeInFrustum(var6, var9, var13, var7, var10, var14);
+						if(var15) {
+							float var19 = var14;
+							float var18 = var10;
+							float var23 = var7;
+							var14 = var13;
+							var13 = var9;
+							float var17 = var6;
+							Frustum var16 = var2;
+							int var20 = 0;
+
+							boolean var10000;
+							while(true) {
+								if(var20 >= 6) {
+									var10000 = true;
+									break;
+								}
+
+								if(var16.m_Frustum[var20][0] * var17 + var16.m_Frustum[var20][1] * var13 + var16.m_Frustum[var20][2] * var14 + var16.m_Frustum[var20][3] <= 0.0F) {
+									var10000 = false;
+									break;
+								}
+
+								if(var16.m_Frustum[var20][0] * var23 + var16.m_Frustum[var20][1] * var13 + var16.m_Frustum[var20][2] * var14 + var16.m_Frustum[var20][3] <= 0.0F) {
+									var10000 = false;
+									break;
+								}
+
+								if(var16.m_Frustum[var20][0] * var17 + var16.m_Frustum[var20][1] * var18 + var16.m_Frustum[var20][2] * var14 + var16.m_Frustum[var20][3] <= 0.0F) {
+									var10000 = false;
+									break;
+								}
+
+								if(var16.m_Frustum[var20][0] * var23 + var16.m_Frustum[var20][1] * var18 + var16.m_Frustum[var20][2] * var14 + var16.m_Frustum[var20][3] <= 0.0F) {
+									var10000 = false;
+									break;
+								}
+
+								if(var16.m_Frustum[var20][0] * var17 + var16.m_Frustum[var20][1] * var13 + var16.m_Frustum[var20][2] * var19 + var16.m_Frustum[var20][3] <= 0.0F) {
+									var10000 = false;
+									break;
+								}
+
+								if(var16.m_Frustum[var20][0] * var23 + var16.m_Frustum[var20][1] * var13 + var16.m_Frustum[var20][2] * var19 + var16.m_Frustum[var20][3] <= 0.0F) {
+									var10000 = false;
+									break;
+								}
+
+								if(var16.m_Frustum[var20][0] * var17 + var16.m_Frustum[var20][1] * var18 + var16.m_Frustum[var20][2] * var19 + var16.m_Frustum[var20][3] <= 0.0F) {
+									var10000 = false;
+									break;
+								}
+
+								if(var16.m_Frustum[var20][0] * var23 + var16.m_Frustum[var20][1] * var18 + var16.m_Frustum[var20][2] * var19 + var16.m_Frustum[var20][3] <= 0.0F) {
+									var10000 = false;
+									break;
+								}
+
+								++var20;
+							}
+
+							boolean var21 = var10000;
+
+							for(int var22 = 0; var22 < var12.size(); ++var22) {
+								Entity var24 = (Entity)var12.get(var22);
+								if(var24.shouldRender(var1)) {
+									if(!var21) {
+										AABB var25 = var24.bb;
+										if(!var2.cubeInFrustum(var25.x0, var25.y0, var25.z0, var25.x1, var25.y1, var25.z1)) {
+											continue;
+										}
+									}
+
+									var24.render(var3, var4);
 								}
 							}
 						}

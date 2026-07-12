@@ -5,7 +5,7 @@ import java.net.URL;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.mojang.util.MathHelper;
+import com.mojang.util.Mth;
 
 import net.lax1dude.eaglercraft.internal.paulscode.lwjgl3.LibraryLWJGLOpenAL;
 import paulscode.sound.SoundSystem;
@@ -229,12 +229,12 @@ public class PlatformAudio {
 		if (sndSystem == null) {
 			return;
 		}
-		float f2 = MathHelper.cos((yawDegrees + 90.0F) * 0.017453292F);
-		float f3 = MathHelper.sin((yawDegrees + 90.0F) * 0.017453292F);
-		float f4 = MathHelper.cos(-pitchDegrees * 0.017453292F);
-		float f5 = MathHelper.sin(-pitchDegrees * 0.017453292F);
-		float f6 = MathHelper.cos((-pitchDegrees + 90.0F) * 0.017453292F);
-		float f7 = MathHelper.sin((-pitchDegrees + 90.0F) * 0.017453292F);
+		float f2 = Mth.cos((yawDegrees + 90.0F) * 0.017453292F);
+		float f3 = Mth.sin((yawDegrees + 90.0F) * 0.017453292F);
+		float f4 = Mth.cos(-pitchDegrees * 0.017453292F);
+		float f5 = Mth.sin(-pitchDegrees * 0.017453292F);
+		float f6 = Mth.cos((-pitchDegrees + 90.0F) * 0.017453292F);
+		float f7 = Mth.sin((-pitchDegrees + 90.0F) * 0.017453292F);
 		float f8 = f2 * f4;
 		float f9 = f3 * f4;
 		float f10 = f2 * f6;

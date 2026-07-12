@@ -1,6 +1,7 @@
 package com.mojang.minecraft.renderer.texture;
 
 import com.mojang.minecraft.level.tile.Tile;
+import com.mojang.util.Mth;
 
 public final class LavaTexture extends DynamicTexture {
 	private float[] red = new float[256];
@@ -24,8 +25,8 @@ public final class LavaTexture extends DynamicTexture {
 		for(var1 = 0; var1 < 16; ++var1) {
 			for(var2 = 0; var2 < 16; ++var2) {
 				var3 = 0.0F;
-				int var4 = (int)(Math.sin((double)var2 * Math.PI * 2.0D / 16.0D) * (double)1.2F);
-				var5 = (int)(Math.sin((double)var1 * Math.PI * 2.0D / 16.0D) * (double)1.2F);
+				int var4 = (int)(Mth.sin((float)var2 * (float)Math.PI * 2.0F / 16.0F) * 1.2F);
+				var5 = (int)(Mth.sin((float)var1 * (float)Math.PI * 2.0F / 16.0F) * 1.2F);
 
 				for(var6 = var1 - 1; var6 <= var1 + 1; ++var6) {
 					for(var7 = var2 - 1; var7 <= var2 + 1; ++var7) {

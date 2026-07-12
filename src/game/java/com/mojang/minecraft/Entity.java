@@ -4,10 +4,11 @@ import com.mojang.minecraft.level.BlockMap;
 import com.mojang.minecraft.level.Level;
 import com.mojang.minecraft.level.liquid.Liquid;
 import com.mojang.minecraft.level.tile.Tile;
+import com.mojang.minecraft.model.Vec3;
 import com.mojang.minecraft.net.EntityPos;
 import com.mojang.minecraft.phys.AABB;
-import com.mojang.minecraft.player.Player;
 import com.mojang.minecraft.renderer.Textures;
+import com.mojang.util.Mth;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -15,7 +16,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Entity implements Serializable {
+public abstract class Entity implements Serializable {
 	public static final long serialVersionUID = 0L;
 	public Level level;
 	public float xo;
@@ -49,6 +50,12 @@ public class Entity implements Serializable {
 	public float xOld;
 	public float yOld;
 	public float zOld;
+	public int textureId = 0;
+	public float ySlideOffset = 0.0F;
+	public float footSize = 0.0F;
+	public boolean noPhysics = false;
+	public float pushthrough = 0.0F;
+	public boolean hovered = false;
 
 	public Entity(Level var1) {
 		this.level = var1;
@@ -149,6 +156,12 @@ public class Entity implements Serializable {
 		this.yRotO = this.yRot;
 	}
 
+	public boolean isFree(float var1, float var2, float var3, float var4) {
+		AABB var5 = this.bb.grow(var4, var4, var4).cloneMove(var1, var2, var3);
+		ArrayList var6 = this.level.getCubes(var5);
+		return var6.size() > 0 ? false : !this.level.containsAnyLiquid(var5);
+	}
+
 	public boolean isFree(float var1, float var2, float var3) {
 		AABB var4 = this.bb.cloneMove(var1, var2, var3);
 		ArrayList var5 = this.level.getCubes(var4);
@@ -156,88 +169,156 @@ public class Entity implements Serializable {
 	}
 
 	public void move(float var1, float var2, float var3) {
-		float var4 = this.x;
-		float var5 = this.z;
-		float var6 = var1;
-		float var7 = var2;
-		float var8 = var3;
-		ArrayList var9 = this.level.getCubes(this.bb.expand(var1, var2, var3));
+		if(this.noPhysics) {
+			this.bb.move(var1, var2, var3);
+			this.x = (this.bb.x0 + this.bb.x1) / 2.0F;
+			this.y = this.bb.y0 + this.heightOffset - this.ySlideOffset;
+			this.z = (this.bb.z0 + this.bb.z1) / 2.0F;
+		} else {
+			float var4 = this.x;
+			float var5 = this.z;
+			float var6 = var1;
+			float var7 = var2;
+			float var8 = var3;
+			AABB var9 = this.bb.copy();
+			ArrayList var10 = this.level.getCubes(this.bb.expand(var1, var2, var3));
 
-		int var10;
-		for(var10 = 0; var10 < var9.size(); ++var10) {
-			var2 = ((AABB)var9.get(var10)).clipYCollide(this.bb, var2);
-		}
-
-		this.bb.move(0.0F, var2, 0.0F);
-		if(!this.slide && var7 != var2) {
-			var3 = 0.0F;
-			var2 = var3;
-			var1 = var3;
-		}
-
-		for(var10 = 0; var10 < var9.size(); ++var10) {
-			var1 = ((AABB)var9.get(var10)).clipXCollide(this.bb, var1);
-		}
-
-		this.bb.move(var1, 0.0F, 0.0F);
-		if(!this.slide && var6 != var1) {
-			var3 = 0.0F;
-			var2 = var3;
-			var1 = var3;
-		}
-
-		for(var10 = 0; var10 < var9.size(); ++var10) {
-			var3 = ((AABB)var9.get(var10)).clipZCollide(this.bb, var3);
-		}
-
-		this.bb.move(0.0F, 0.0F, var3);
-		if(!this.slide && var8 != var3) {
-			var3 = 0.0F;
-			var2 = var3;
-			var1 = var3;
-		}
-
-		this.horizontalCollision = var6 != var1 || var8 != var3;
-		this.onGround = var7 != var2 && var7 < 0.0F;
-		this.collision = this.horizontalCollision || var7 != var2;
-		if(this.onGround) {
-			if(this.fallDistance > 0.0F) {
-				this.causeFallDamage(this.fallDistance);
-				this.fallDistance = 0.0F;
+			for(int var11 = 0; var11 < var10.size(); ++var11) {
+				var2 = ((AABB)var10.get(var11)).clipYCollide(this.bb, var2);
 			}
-		} else if(var2 < 0.0F) {
-			this.fallDistance -= var2;
-		}
 
-		if(var6 != var1) {
-			this.xd = 0.0F;
-		}
+			this.bb.move(0.0F, var2, 0.0F);
+			if(!this.slide && var7 != var2) {
+				var3 = 0.0F;
+				var2 = var3;
+				var1 = var3;
+			}
 
-		if(var7 != var2) {
-			this.yd = 0.0F;
-		}
+			boolean var16 = this.onGround || var7 != var2 && var7 < 0.0F;
 
-		if(var8 != var3) {
-			this.zd = 0.0F;
-		}
+			int var12;
+			for(var12 = 0; var12 < var10.size(); ++var12) {
+				var1 = ((AABB)var10.get(var12)).clipXCollide(this.bb, var1);
+			}
 
-		this.x = (this.bb.x0 + this.bb.x1) / 2.0F;
-		this.y = this.bb.y0 + this.heightOffset;
-		this.z = (this.bb.z0 + this.bb.z1) / 2.0F;
-		float var13 = this.x - var4;
-		var1 = this.z - var5;
-		this.walkDist = (float)((double)this.walkDist + Math.sqrt((double)(var13 * var13 + var1 * var1)) * 0.6D);
-		if(this.makeStepSound) {
-			int var11 = this.level.getTile((int)this.x, (int)(this.y - 0.2F - this.heightOffset), (int)this.z);
-			if(this.walkDist > (float)this.nextStep && var11 > 0) {
-				++this.nextStep;
-				Tile.SoundType var12 = Tile.tiles[var11].soundType;
-				if(var12 != Tile.SoundType.none) {
-					this.playSound("step." + var12.name, var12.getVolume() * (12.0F / 16.0F), var12.getPitch());
+			this.bb.move(var1, 0.0F, 0.0F);
+			if(!this.slide && var6 != var1) {
+				var3 = 0.0F;
+				var2 = var3;
+				var1 = var3;
+			}
+
+			for(var12 = 0; var12 < var10.size(); ++var12) {
+				var3 = ((AABB)var10.get(var12)).clipZCollide(this.bb, var3);
+			}
+
+			this.bb.move(0.0F, 0.0F, var3);
+			if(!this.slide && var8 != var3) {
+				var3 = 0.0F;
+				var2 = var3;
+				var1 = var3;
+			}
+
+			float var17;
+			float var18;
+			if(this.footSize > 0.0F && var16 && this.ySlideOffset < 0.05F && (var6 != var1 || var8 != var3)) {
+				var18 = var1;
+				var17 = var2;
+				float var13 = var3;
+				var1 = var6;
+				var2 = this.footSize;
+				var3 = var8;
+				AABB var14 = this.bb.copy();
+				this.bb = var9.copy();
+				var10 = this.level.getCubes(this.bb.expand(var6, var2, var8));
+
+				int var15;
+				for(var15 = 0; var15 < var10.size(); ++var15) {
+					var2 = ((AABB)var10.get(var15)).clipYCollide(this.bb, var2);
+				}
+
+				this.bb.move(0.0F, var2, 0.0F);
+				if(!this.slide && var7 != var2) {
+					var3 = 0.0F;
+					var2 = var3;
+					var1 = var3;
+				}
+
+				for(var15 = 0; var15 < var10.size(); ++var15) {
+					var1 = ((AABB)var10.get(var15)).clipXCollide(this.bb, var1);
+				}
+
+				this.bb.move(var1, 0.0F, 0.0F);
+				if(!this.slide && var6 != var1) {
+					var3 = 0.0F;
+					var2 = var3;
+					var1 = var3;
+				}
+
+				for(var15 = 0; var15 < var10.size(); ++var15) {
+					var3 = ((AABB)var10.get(var15)).clipZCollide(this.bb, var3);
+				}
+
+				this.bb.move(0.0F, 0.0F, var3);
+				if(!this.slide && var8 != var3) {
+					var3 = 0.0F;
+					var2 = var3;
+					var1 = var3;
+				}
+
+				if(var18 * var18 + var13 * var13 >= var1 * var1 + var3 * var3) {
+					var1 = var18;
+					var2 = var17;
+					var3 = var13;
+					this.bb = var14.copy();
+				} else {
+					this.ySlideOffset = (float)((double)this.ySlideOffset + 0.5D);
 				}
 			}
-		}
 
+			this.horizontalCollision = var6 != var1 || var8 != var3;
+			this.onGround = var7 != var2 && var7 < 0.0F;
+			this.collision = this.horizontalCollision || var7 != var2;
+			if(this.onGround) {
+				if(this.fallDistance > 0.0F) {
+					this.causeFallDamage(this.fallDistance);
+					this.fallDistance = 0.0F;
+				}
+			} else if(var2 < 0.0F) {
+				this.fallDistance -= var2;
+			}
+
+			if(var6 != var1) {
+				this.xd = 0.0F;
+			}
+
+			if(var7 != var2) {
+				this.yd = 0.0F;
+			}
+
+			if(var8 != var3) {
+				this.zd = 0.0F;
+			}
+
+			this.x = (this.bb.x0 + this.bb.x1) / 2.0F;
+			this.y = this.bb.y0 + this.heightOffset - this.ySlideOffset;
+			this.z = (this.bb.z0 + this.bb.z1) / 2.0F;
+			var18 = this.x - var4;
+			var17 = this.z - var5;
+			this.walkDist = (float)((double)this.walkDist + (double)Mth.sqrt_float(var18 * var18 + var17 * var17) * 0.6D);
+			if(this.makeStepSound) {
+				int var19 = this.level.getTile((int)this.x, (int)(this.y - 0.2F - this.heightOffset), (int)this.z);
+				if(this.walkDist > (float)this.nextStep && var19 > 0) {
+					++this.nextStep;
+					Tile.SoundType var20 = Tile.tiles[var19].soundType;
+					if(var20 != Tile.SoundType.none) {
+						this.playSound("step." + var20.name, var20.getVolume() * (12.0F / 16.0F), var20.getPitch());
+					}
+				}
+			}
+
+			this.ySlideOffset *= 0.4F;
+		}
 	}
 
 	protected void causeFallDamage(float var1) {
@@ -257,7 +338,7 @@ public class Entity implements Serializable {
 	}
 
 	public void moveRelative(float var1, float var2, float var3) {
-		float var4 = (float)Math.sqrt((double)(var1 * var1 + var2 * var2));
+		float var4 = Mth.sqrt_float(var1 * var1 + var2 * var2);
 		if(var4 >= 0.01F) {
 			if(var4 < 1.0F) {
 				var4 = 1.0F;
@@ -266,8 +347,8 @@ public class Entity implements Serializable {
 			var4 = var3 / var4;
 			var1 *= var4;
 			var2 *= var4;
-			var3 = (float)Math.sin((double)this.yRot * Math.PI / 180.0D);
-			var4 = (float)Math.cos((double)this.yRot * Math.PI / 180.0D);
+			var3 = Mth.sin(this.yRot * (float)Math.PI / 180.0F);
+			var4 = Mth.cos(this.yRot * (float)Math.PI / 180.0F);
 			this.xd += var1 * var4 - var2 * var3;
 			this.zd += var2 * var4 + var1 * var3;
 		}
@@ -282,7 +363,7 @@ public class Entity implements Serializable {
 
 	public float getBrightness(float var1) {
 		int var4 = (int)this.x;
-		int var2 = (int)(this.y + this.heightOffset / 2.0F);
+		int var2 = (int)(this.y + this.heightOffset / 2.0F - 0.5F);
 		int var3 = (int)this.z;
 		return this.level.getBrightness(var4, var2, var3);
 	}
@@ -311,7 +392,14 @@ public class Entity implements Serializable {
 		float var2 = this.x - var1.x;
 		float var3 = this.y - var1.y;
 		float var4 = this.z - var1.z;
-		return (float)Math.sqrt((double)(var2 * var2 + var3 * var3 + var4 * var4));
+		return Mth.sqrt_float(var2 * var2 + var3 * var3 + var4 * var4);
+	}
+
+	public float distanceTo(float var1, float var2, float var3) {
+		var1 = this.x - var1;
+		var2 = this.y - var2;
+		float var4 = this.z - var3;
+		return Mth.sqrt_float(var1 * var1 + var2 * var2 + var4 * var4);
 	}
 
 	public float distanceToSqr(Entity var1) {
@@ -321,7 +409,7 @@ public class Entity implements Serializable {
 		return var2 * var2 + var3 * var3 + var4 * var4;
 	}
 
-	public void playerTouch(Player var1) {
+	public void playerTouch(Entity var1) {
 	}
 
 	public void push(Entity var1) {
@@ -329,13 +417,15 @@ public class Entity implements Serializable {
 		float var3 = var1.z - this.z;
 		float var4 = var2 * var2 + var3 * var3;
 		if(var4 >= 0.01F) {
-			var4 = (float)Math.sqrt((double)var4);
+			var4 = Mth.sqrt_float(var4);
 			var2 /= var4;
 			var3 /= var4;
 			var2 /= var4;
 			var3 /= var4;
 			var2 *= 0.05F;
 			var3 *= 0.05F;
+			var2 *= 1.0F - this.pushthrough;
+			var3 *= 1.0F - this.pushthrough;
 			this.push(-var2, 0.0F, -var3);
 			var1.push(var2, 0.0F, var3);
 		}
@@ -368,6 +458,31 @@ public class Entity implements Serializable {
 	}
 
 	public void awardKillScore(Entity var1, int var2) {
+	}
+
+	public boolean shouldRender(Vec3 var1) {
+		float var2 = this.x - var1.x;
+		float var3 = this.y - var1.y;
+		float var4 = this.z - var1.z;
+		var4 = var2 * var2 + var3 * var3 + var4 * var4;
+		return this.shouldRenderAtSqrDistance(var4);
+	}
+
+	public boolean shouldRenderAtSqrDistance(float var1) {
+		float var2 = this.bb.getSize();
+		var2 *= 64.0F;
+		return var1 < var2 * var2;
+	}
+
+	public int getTexture() {
+		return this.textureId;
+	}
+
+	public boolean isCreativeModeAllowed() {
+		return false;
+	}
+
+	public void renderHover(Textures var1, float var2) {
 	}
 	
 	public void writeTo(DataOutputStream out) throws IOException {

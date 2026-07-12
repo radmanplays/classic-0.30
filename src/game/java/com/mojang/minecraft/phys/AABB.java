@@ -1,8 +1,8 @@
 package com.mojang.minecraft.phys;
 
+import com.mojang.minecraft.HitResult;
 import com.mojang.minecraft.model.Vec3;
 import java.io.Serializable;
-import org.lwjgl.opengl.GL11;
 
 public class AABB implements Serializable {
 	public static final long serialVersionUID = 0L;
@@ -156,6 +156,10 @@ public class AABB implements Serializable {
 		return var1.x1 > this.x0 && var1.x0 < this.x1 ? (var1.y1 > this.y0 && var1.y0 < this.y1 ? var1.z1 > this.z0 && var1.z0 < this.z1 : false) : false;
 	}
 
+	public boolean intersectsInner(AABB var1) {
+		return var1.x1 >= this.x0 && var1.x0 <= this.x1 ? (var1.y1 >= this.y0 && var1.y0 <= this.y1 ? var1.z1 >= this.z0 && var1.z0 <= this.z1 : false) : false;
+	}
+
 	public void move(float var1, float var2, float var3) {
 		this.x0 += var1;
 		this.y0 += var2;
@@ -173,30 +177,148 @@ public class AABB implements Serializable {
 		return var1.x > this.x0 && var1.x < this.x1 ? (var1.y > this.y0 && var1.y < this.y1 ? var1.z > this.z0 && var1.z < this.z1 : false) : false;
 	}
 
-	public void render() {
-		GL11.glBegin(GL11.GL_LINE_STRIP);
-		GL11.glVertex3f(this.x0, this.y0, this.z0);
-		GL11.glVertex3f(this.x1, this.y0, this.z0);
-		GL11.glVertex3f(this.x1, this.y0, this.z1);
-		GL11.glVertex3f(this.x0, this.y0, this.z1);
-		GL11.glVertex3f(this.x0, this.y0, this.z0);
-		GL11.glEnd();
-		GL11.glBegin(GL11.GL_LINE_STRIP);
-		GL11.glVertex3f(this.x0, this.y1, this.z0);
-		GL11.glVertex3f(this.x1, this.y1, this.z0);
-		GL11.glVertex3f(this.x1, this.y1, this.z1);
-		GL11.glVertex3f(this.x0, this.y1, this.z1);
-		GL11.glVertex3f(this.x0, this.y1, this.z0);
-		GL11.glEnd();
-		GL11.glBegin(GL11.GL_LINES);
-		GL11.glVertex3f(this.x0, this.y0, this.z0);
-		GL11.glVertex3f(this.x0, this.y1, this.z0);
-		GL11.glVertex3f(this.x1, this.y0, this.z0);
-		GL11.glVertex3f(this.x1, this.y1, this.z0);
-		GL11.glVertex3f(this.x1, this.y0, this.z1);
-		GL11.glVertex3f(this.x1, this.y1, this.z1);
-		GL11.glVertex3f(this.x0, this.y0, this.z1);
-		GL11.glVertex3f(this.x0, this.y1, this.z1);
-		GL11.glEnd();
+	public float getSize() {
+		float var1 = this.x1 - this.x0;
+		float var2 = this.y1 - this.y0;
+		float var3 = this.z1 - this.z0;
+		return (var1 + var2 + var3) / 3.0F;
+	}
+
+	public AABB shrink(float var1, float var2, float var3) {
+		float var4 = this.x0;
+		float var5 = this.y0;
+		float var6 = this.z0;
+		float var7 = this.x1;
+		float var8 = this.y1;
+		float var9 = this.z1;
+		if(var1 < 0.0F) {
+			var4 -= var1;
+		}
+
+		if(var1 > 0.0F) {
+			var7 -= var1;
+		}
+
+		if(var2 < 0.0F) {
+			var5 -= var2;
+		}
+
+		if(var2 > 0.0F) {
+			var8 -= var2;
+		}
+
+		if(var3 < 0.0F) {
+			var6 -= var3;
+		}
+
+		if(var3 > 0.0F) {
+			var9 -= var3;
+		}
+
+		return new AABB(var4, var5, var6, var7, var8, var9);
+	}
+
+	public AABB copy() {
+		return new AABB(this.x0, this.y0, this.z0, this.x1, this.y1, this.z1);
+	}
+
+	public HitResult clip(Vec3 var1, Vec3 var2) {
+		Vec3 var3 = var1.clipX(var2, this.x0);
+		Vec3 var4 = var1.clipX(var2, this.x1);
+		Vec3 var5 = var1.clipY(var2, this.y0);
+		Vec3 var6 = var1.clipY(var2, this.y1);
+		Vec3 var7 = var1.clipZ(var2, this.z0);
+		var2 = var1.clipZ(var2, this.z1);
+		if(!this.containsX(var3)) {
+			var3 = null;
+		}
+
+		if(!this.containsX(var4)) {
+			var4 = null;
+		}
+
+		if(!this.containsY(var5)) {
+			var5 = null;
+		}
+
+		if(!this.containsY(var6)) {
+			var6 = null;
+		}
+
+		if(!this.containsZ(var7)) {
+			var7 = null;
+		}
+
+		if(!this.containsZ(var2)) {
+			var2 = null;
+		}
+
+		Vec3 var8 = null;
+		if(var3 != null) {
+			var8 = var3;
+		}
+
+		if(var4 != null && (var8 == null || var1.distanceToSqr(var4) < var1.distanceToSqr(var8))) {
+			var8 = var4;
+		}
+
+		if(var5 != null && (var8 == null || var1.distanceToSqr(var5) < var1.distanceToSqr(var8))) {
+			var8 = var5;
+		}
+
+		if(var6 != null && (var8 == null || var1.distanceToSqr(var6) < var1.distanceToSqr(var8))) {
+			var8 = var6;
+		}
+
+		if(var7 != null && (var8 == null || var1.distanceToSqr(var7) < var1.distanceToSqr(var8))) {
+			var8 = var7;
+		}
+
+		if(var2 != null && (var8 == null || var1.distanceToSqr(var2) < var1.distanceToSqr(var8))) {
+			var8 = var2;
+		}
+
+		if(var8 == null) {
+			return null;
+		} else {
+			byte var9 = -1;
+			if(var8 == var3) {
+				var9 = 4;
+			}
+
+			if(var8 == var4) {
+				var9 = 5;
+			}
+
+			if(var8 == var5) {
+				var9 = 0;
+			}
+
+			if(var8 == var6) {
+				var9 = 1;
+			}
+
+			if(var8 == var7) {
+				var9 = 2;
+			}
+
+			if(var8 == var2) {
+				var9 = 3;
+			}
+
+			return new HitResult(0, 0, 0, var9, var8);
+		}
+	}
+
+	private boolean containsX(Vec3 var1) {
+		return var1 == null ? false : var1.y >= this.y0 && var1.y <= this.y1 && var1.z >= this.z0 && var1.z <= this.z1;
+	}
+
+	private boolean containsY(Vec3 var1) {
+		return var1 == null ? false : var1.x >= this.x0 && var1.x <= this.x1 && var1.z >= this.z0 && var1.z <= this.z1;
+	}
+
+	private boolean containsZ(Vec3 var1) {
+		return var1 == null ? false : var1.x >= this.x0 && var1.x <= this.x1 && var1.y >= this.y0 && var1.y <= this.y1;
 	}
 }

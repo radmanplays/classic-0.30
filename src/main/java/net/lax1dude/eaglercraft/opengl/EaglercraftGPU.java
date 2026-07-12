@@ -22,7 +22,7 @@ import net.lax1dude.eaglercraft.internal.buffer.IntBuffer;
 
 import com.carrotsearch.hppc.IntObjectHashMap;
 import com.carrotsearch.hppc.IntObjectMap;
-import com.mojang.util.MathHelper;
+import com.mojang.util.Mth;
 
 import net.lax1dude.eaglercraft.EagRuntime;
 import net.lax1dude.eaglercraft.internal.GLObjectMap;
@@ -446,7 +446,7 @@ public class EaglercraftGPU extends GlStateManager {
 	public static void glTexStorage2D(int target, int levels, int internalFormat, int w, int h) {
 		GlStateManager.setTextureCachedSize(target, w, h);
 		if (texStorageCapable
-				&& (glesVers >= 300 || levels == 1 || (MathHelper.log2DeBruijn(Math.max(w, h)) + 1) == levels)) {
+				&& (glesVers >= 300 || levels == 1 || (Mth.log2DeBruijn(Math.max(w, h)) + 1) == levels)) {
 			_wglTexStorage2D(target, levels, internalFormat, w, h);
 		} else {
 			int tv = TextureFormatHelper.trivializeInternalFormatToGLES20(internalFormat);

@@ -6,6 +6,8 @@ import com.mojang.minecraft.phys.AABB;
 import com.mojang.minecraft.player.Player;
 import com.mojang.minecraft.renderer.Tesselator;
 import com.mojang.minecraft.renderer.Textures;
+import com.mojang.util.Mth;
+
 import java.util.List;
 import org.lwjgl.opengl.GL11;
 
@@ -39,10 +41,10 @@ public class Arrow extends Entity {
 		}
 
 		this.heightOffset = 0.25F;
-		float var10 = (float)Math.cos((double)(-var6) * Math.PI / 180.0D - Math.PI);
-		float var11 = (float)Math.sin((double)(-var6) * Math.PI / 180.0D - Math.PI);
-		var6 = (float)Math.cos((double)(-var7) * Math.PI / 180.0D);
-		var7 = (float)Math.sin((double)(-var7) * Math.PI / 180.0D);
+		float var10 = Mth.cos(-var6 * ((float)Math.PI / 180.0F) - (float)Math.PI);
+		float var11 = Mth.sin(-var6 * ((float)Math.PI / 180.0F) - (float)Math.PI);
+		var6 = Mth.cos(-var7 * ((float)Math.PI / 180.0F));
+		var7 = Mth.sin(-var7 * ((float)Math.PI / 180.0F));
 		this.slide = false;
 		this.gravity = 1.0F / var8;
 		this.xo -= var10 * 0.2F;
@@ -53,9 +55,9 @@ public class Arrow extends Entity {
 		this.yd = var7 * var8;
 		this.zd = var10 * var6 * var8;
 		this.setPos(var3, var4, var5);
-		var10 = (float)Math.sqrt((double)(this.xd * this.xd + this.zd * this.zd));
-		this.yRotO = this.yRot = (float)(Math.atan2((double)this.xd, (double)this.zd) * 180.0D / Math.PI);
-		this.xRotO = this.xRot = (float)(Math.atan2((double)this.yd, (double)var10) * 180.0D / Math.PI);
+		var10 = Mth.sqrt_float(this.xd * this.xd + this.zd * this.zd);
+		this.yRotO = this.yRot = (float)(Math.atan2((double)this.xd, (double)this.zd) * 180.0D / (double)((float)Math.PI));
+		this.xRotO = this.xRot = (float)(Math.atan2((double)this.yd, (double)var10) * 180.0D / (double)((float)Math.PI));
 		this.makeStepSound = false;
 	}
 
@@ -82,7 +84,7 @@ public class Arrow extends Entity {
 			this.yd *= 0.998F;
 			this.zd *= 0.998F;
 			this.yd -= 0.02F * this.gravity;
-			float var1 = (float)Math.sqrt((double)(this.xd * this.xd + this.yd * this.yd + this.zd * this.zd));
+			float var1 = Mth.sqrt_float(this.xd * this.xd + this.yd * this.yd + this.zd * this.zd);
 			int var9 = (int)(var1 / 0.2F + 1.0F);
 			float var2 = this.xd / (float)var9;
 			float var3 = this.yd / (float)var9;
@@ -121,10 +123,10 @@ public class Arrow extends Entity {
 			}
 
 			if(!this.hasHit) {
-				float var10 = (float)Math.sqrt((double)(this.xd * this.xd + this.zd * this.zd));
-				this.yRot = (float)(Math.atan2((double)this.xd, (double)this.zd) * 180.0D / Math.PI);
+				float var10 = Mth.sqrt_float(this.xd * this.xd + this.zd * this.zd);
+				this.yRot = (float)(Math.atan2((double)this.xd, (double)this.zd) * 180.0D / (double)((float)Math.PI));
 
-				for(this.xRot = (float)(Math.atan2((double)this.yd, (double)var10) * 180.0D / Math.PI); this.xRot - this.xRotO < -180.0F; this.xRotO -= 360.0F) {
+				for(this.xRot = (float)(Math.atan2((double)this.yd, (double)var10) * 180.0D / (double)((float)Math.PI)); this.xRot - this.xRotO < -180.0F; this.xRotO -= 360.0F) {
 				}
 
 				while(this.xRot - this.xRotO >= 180.0F) {
@@ -147,16 +149,16 @@ public class Arrow extends Entity {
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_ALPHA_TEST);
 		GL11.glAlphaFunc(GL11.GL_GREATER, 0.1f);
-		int var10 = var1.loadTexture("/item/arrows.png");
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, var10);
-		float var11 = this.level.getBrightness((int)this.x, (int)this.y, (int)this.z);
+		this.textureId = var1.loadTexture("/item/arrows.png");
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.textureId);
+		float var10 = this.level.getBrightness((int)this.x, (int)this.y, (int)this.z);
 		GL11.glPushMatrix();
-		GL11.glColor4f(var11, var11, var11, 1.0F);
+		GL11.glColor4f(var10, var10, var10, 1.0F);
 		GL11.glTranslatef(this.xo + (this.x - this.xo) * var2, this.yo + (this.y - this.yo) * var2 - this.heightOffset / 2.0F, this.zo + (this.z - this.zo) * var2);
 		GL11.glRotatef(this.yRotO + (this.yRot - this.yRotO) * var2 - 90.0F, 0.0F, 1.0F, 0.0F);
 		GL11.glRotatef(this.xRotO + (this.xRot - this.xRotO) * var2, 0.0F, 0.0F, 1.0F);
 		GL11.glRotatef(45.0F, 1.0F, 0.0F, 0.0F);
-		Tesselator var12 = Tesselator.instance;
+		Tesselator var11 = Tesselator.instance;
 		var2 = 0.5F;
 		float var3 = (float)(0 + this.type * 10) / 32.0F;
 		float var4 = (float)(5 + this.type * 10) / 32.0F;
@@ -166,29 +168,29 @@ public class Arrow extends Entity {
 		float var7 = 0.05625F;
 		GL11.glScalef(var7, var7, var7);
 		GL11.glNormal3f(var7, 0.0F, 0.0F);
-		var12.begin();
-		var12.vertexUV(-7.0F, -2.0F, -2.0F, 0.0F, var6);
-		var12.vertexUV(-7.0F, -2.0F, 2.0F, var5, var6);
-		var12.vertexUV(-7.0F, 2.0F, 2.0F, var5, var8);
-		var12.vertexUV(-7.0F, 2.0F, -2.0F, 0.0F, var8);
-		var12.end();
+		var11.begin();
+		var11.vertexUV(-7.0F, -2.0F, -2.0F, 0.0F, var6);
+		var11.vertexUV(-7.0F, -2.0F, 2.0F, var5, var6);
+		var11.vertexUV(-7.0F, 2.0F, 2.0F, var5, var8);
+		var11.vertexUV(-7.0F, 2.0F, -2.0F, 0.0F, var8);
+		var11.end();
 		GL11.glNormal3f(-var7, 0.0F, 0.0F);
-		var12.begin();
-		var12.vertexUV(-7.0F, 2.0F, -2.0F, 0.0F, var6);
-		var12.vertexUV(-7.0F, 2.0F, 2.0F, var5, var6);
-		var12.vertexUV(-7.0F, -2.0F, 2.0F, var5, var8);
-		var12.vertexUV(-7.0F, -2.0F, -2.0F, 0.0F, var8);
-		var12.end();
+		var11.begin();
+		var11.vertexUV(-7.0F, 2.0F, -2.0F, 0.0F, var6);
+		var11.vertexUV(-7.0F, 2.0F, 2.0F, var5, var6);
+		var11.vertexUV(-7.0F, -2.0F, 2.0F, var5, var8);
+		var11.vertexUV(-7.0F, -2.0F, -2.0F, 0.0F, var8);
+		var11.end();
 
 		for(int var9 = 0; var9 < 4; ++var9) {
 			GL11.glRotatef(90.0F, 1.0F, 0.0F, 0.0F);
 			GL11.glNormal3f(0.0F, -var7, 0.0F);
-			var12.begin();
-			var12.vertexUV(-8.0F, -2.0F, 0.0F, 0.0F, var3);
-			var12.vertexUV(8.0F, -2.0F, 0.0F, var2, var3);
-			var12.vertexUV(8.0F, 2.0F, 0.0F, var2, var4);
-			var12.vertexUV(-8.0F, 2.0F, 0.0F, 0.0F, var4);
-			var12.end();
+			var11.begin();
+			var11.vertexUV(-8.0F, -2.0F, 0.0F, 0.0F, var3);
+			var11.vertexUV(8.0F, -2.0F, 0.0F, var2, var3);
+			var11.vertexUV(8.0F, 2.0F, 0.0F, var2, var4);
+			var11.vertexUV(-8.0F, 2.0F, 0.0F, 0.0F, var4);
+			var11.end();
 		}
 
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -203,10 +205,11 @@ public class Arrow extends Entity {
 		return this.owner;
 	}
 
-	public void playerTouch(Player var1) {
-		if(this.hasHit && this.owner == var1 && var1.arrows < 99) {
-			this.level.addEntity(new TakeEntityAnim(this.level, this, var1));
-			++var1.arrows;
+	public void playerTouch(Entity var1) {
+		Player var2 = (Player)var1;
+		if(this.hasHit && this.owner == var2 && var2.arrows < 99) {
+			this.level.addEntity(new TakeEntityAnim(this.level, this, var2));
+			++var2.arrows;
 			this.remove();
 		}
 

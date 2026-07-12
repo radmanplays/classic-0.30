@@ -1,6 +1,5 @@
 package com.mojang.minecraft.mob;
 
-import com.mojang.minecraft.Entity;
 import com.mojang.minecraft.level.Level;
 import com.mojang.minecraft.mob.ai.BasicAttackAI;
 
@@ -13,16 +12,9 @@ public class Zombie extends HumanoidMob {
 		this.textureName = "/mob/zombie.png";
 		this.heightOffset = 1.62F;
 		BasicAttackAI var5 = new BasicAttackAI();
+		this.deathScore = 80;
 		var5.defaultLookAngle = 30;
 		var5.runSpeed = 1.0F;
 		this.ai = var5;
-	}
-
-	public void die(Entity var1) {
-		if(var1 != null) {
-			var1.awardKillScore(this, 100);
-		}
-
-		super.die(var1);
 	}
 }

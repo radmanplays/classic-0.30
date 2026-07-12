@@ -1,5 +1,6 @@
 package com.mojang.minecraft.gui;
 
+import com.mojang.minecraft.Options;
 import com.mojang.minecraft.renderer.Tesselator;
 import com.mojang.minecraft.renderer.Textures;
 
@@ -13,8 +14,10 @@ import org.lwjgl.opengl.GL11;
 public final class Font {
 	private int[] charWidths = new int[256];
 	private int fontTexture = 0;
+	private Options options;
 
-	public Font(String var1, Textures var2) {
+	public Font(Options opt, String var1, Textures var2) {
+		this.options = opt;
 		ImageData var3 = ImageData.loadImageFile(EagRuntime.getResourceStream(var1));
 
 		int var4 = var3.getWidth();
@@ -89,6 +92,14 @@ public final class Font {
 					int var10 = (var4 & 1) * 191 + var9;
 					int var11 = ((var4 & 2) >> 1) * 191 + var9;
 					var4 = ((var4 & 4) >> 2) * 191 + var9;
+					if(this.options.anaglyph3d) {
+						var9 = (var4 * 30 + var11 * 59 + var10 * 11) / 100;
+						var11 = (var4 * 30 + var11 * 70) / 100;
+						var10 = (var4 * 30 + var10 * 70) / 100;
+						var4 = var9;
+						var11 = var11;
+						var10 = var10;
+					}
 					var4 = var4 << 16 | var11 << 8 | var10;
 					var8 += 2;
 					if(var5) {

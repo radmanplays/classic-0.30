@@ -1,5 +1,9 @@
 package com.mojang.minecraft.model;
 
+import org.lwjgl.opengl.GL11;
+
+import com.mojang.util.Mth;
+
 public final class CreeperModel extends BaseModel {
 	private Cube head = new Cube(0, 0);
 	private Cube hair;
@@ -30,12 +34,15 @@ public final class CreeperModel extends BaseModel {
 	}
 
 	public final void render(float var1, float var2, float var3, float var4, float var5, float var6) {
-		this.head.yRot = var4 / 57.29578F;
-		this.head.xRot = var5 / 57.29578F;
-		this.leg1.xRot = (float)Math.cos((double)var1 * 0.6662D) * 1.4F * var2;
-		this.leg2.xRot = (float)Math.cos((double)var1 * 0.6662D + Math.PI) * 1.4F * var2;
-		this.leg3.xRot = (float)Math.cos((double)var1 * 0.6662D + Math.PI) * 1.4F * var2;
-		this.leg4.xRot = (float)Math.cos((double)var1 * 0.6662D) * 1.4F * var2;
+		GL11.glEnable(GL11.GL_ALPHA_TEST);
+		GL11.glAlphaFunc(GL11.GL_GREATER, 0.1f);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		this.head.yRot = var4 / (180.0F / (float)Math.PI);
+		this.head.xRot = var5 / (180.0F / (float)Math.PI);
+		this.leg1.xRot = Mth.cos(var1 * 0.6662F) * 1.4F * var2;
+		this.leg2.xRot = Mth.cos(var1 * 0.6662F + (float)Math.PI) * 1.4F * var2;
+		this.leg3.xRot = Mth.cos(var1 * 0.6662F + (float)Math.PI) * 1.4F * var2;
+		this.leg4.xRot = Mth.cos(var1 * 0.6662F) * 1.4F * var2;
 		this.head.render(var6);
 		this.body.render(var6);
 		this.leg1.render(var6);

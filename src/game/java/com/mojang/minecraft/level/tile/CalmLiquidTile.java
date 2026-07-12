@@ -2,7 +2,7 @@ package com.mojang.minecraft.level.tile;
 
 import com.mojang.minecraft.level.Level;
 import com.mojang.minecraft.level.liquid.Liquid;
-import net.lax1dude.eaglercraft.Random;
+import java.util.Random;
 
 public final class CalmLiquidTile extends LiquidTile {
 	protected CalmLiquidTile(int var1, Liquid var2) {

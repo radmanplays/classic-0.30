@@ -13,7 +13,7 @@ public final class OptionsScreen extends Screen {
 	}
 
 	public final void init() {
-		for(int var1 = 0; var1 < 7; ++var1) {
+		for(int var1 = 0; var1 < this.options.optionCount; ++var1) {
 			this.buttons.add(new SmallButton(var1, this.width / 2 - 155 + var1 % 2 * 160, this.height / 6 + 24 * (var1 >> 1), this.options.getMessage(var1)));
 		}
 

@@ -31,11 +31,12 @@ public final class Options {
 	public KeyMapping build = new KeyMapping("Build", 48);
 	public KeyMapping chat = new KeyMapping("Chat", 20);
 	public KeyMapping toggleFog = new KeyMapping("Toggle fog", 33);
-	private KeyMapping save = new KeyMapping("Save location", 28);
-	private KeyMapping load = new KeyMapping("Load location", 19);
+	public KeyMapping save = new KeyMapping("Save location", 28);
+	public KeyMapping load = new KeyMapping("Load location", 19);
 	public KeyMapping[] keys = new KeyMapping[]{this.forward, this.left, this.back, this.right, this.jump, this.build, this.chat, this.toggleFog, this.save, this.load};
 	private Minecraft minecraft;
 	private VFile2 optionsFile;
+	public int optionCount = 8;
 
 	public Options(Minecraft var1) {
 		this.minecraft = var1;
@@ -100,14 +101,16 @@ public final class Options {
 				var6.addTexture(var4, var3);
 			}
 		}
+		if(var1 == 7) {
+			this.limitFramerate = !this.limitFramerate;
+		}
 		this.minecraft.soundManager.settingsChanged();
 		this.save();
 	}
 
 	public final String getMessage(int var1) {
-		return var1 == 0 ? "Music: " + (this.music ? "ON" : "OFF") : (var1 == 1 ? "Sound: " + (this.sound ? "ON" : "OFF") : (var1 == 2 ? "Invert mouse: " + (this.invertYMouse ? "ON" : "OFF") : (var1 == 3 ? "Show FPS: " + (this.showFramerate ? "ON" : "OFF") : (var1 == 4 ? "Render distance: " + RENDER_DISTANCES[this.viewDistance] : (var1 == 5 ? "View bobbing: " + (this.bobView ? "ON" : "OFF") : (var1 == 6 ? "3d anaglyph: " + (this.anaglyph3d ? "ON" : "OFF") : ""))))));
+		return var1 == 0 ? "Music: " + (this.music ? "ON" : "OFF") : (var1 == 1 ? "Sound: " + (this.sound ? "ON" : "OFF") : (var1 == 2 ? "Invert mouse: " + (this.invertYMouse ? "ON" : "OFF") : (var1 == 3 ? "Show FPS: " + (this.showFramerate ? "ON" : "OFF") : (var1 == 4 ? "Render distance: " + RENDER_DISTANCES[this.viewDistance] : (var1 == 5 ? "View bobbing: " + (this.bobView ? "ON" : "OFF") : (var1 == 6 ? "3d anaglyph: " + (this.anaglyph3d ? "ON" : "OFF") : (var1 == 7 ? "Limit framerate: " + (this.limitFramerate ? "ON" : "OFF") : "")))))));
 	}
-
 	private void load() {
 		try {
 			if(this.optionsFile.exists()) {
@@ -149,6 +152,10 @@ public final class Options {
 					if(var5[0].equals("anaglyph3d")) {
 						this.anaglyph3d = var5[1].equals("true");
 					}
+					
+					if(var5[0].equals("limitFramerate")) {
+						this.limitFramerate = var5[1].equals("true");
+					}
 
 					for(int var3 = 0; var3 < this.keys.length; ++var3) {
 						if(var5[0].equals("key_" + this.keys[var3].name)) {
@@ -173,6 +180,7 @@ public final class Options {
 			var1.println("viewDistance:" + this.viewDistance);
 			var1.println("bobView:" + this.bobView);
 			var1.println("anaglyph3d:" + this.anaglyph3d);
+			var1.println("limitFramerate:" + this.limitFramerate);
 
 			for(int var2 = 0; var2 < this.keys.length; ++var2) {
 				var1.println("key_" + this.keys[var2].name + ":" + this.keys[var2].key);

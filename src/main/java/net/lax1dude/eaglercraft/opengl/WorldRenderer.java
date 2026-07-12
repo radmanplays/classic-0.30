@@ -12,7 +12,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.carrotsearch.hppc.sorting.QuickSort;
 import com.mojang.util.GLAllocation;
-import com.mojang.util.MathHelper;
+import com.mojang.util.Mth;
 
 import net.lax1dude.eaglercraft.EagRuntime;
 import net.lax1dude.eaglercraft.vector.Vector3f;
@@ -311,9 +311,9 @@ public class WorldRenderer {
 	 */
 	public void putColorRGB_F(float red, float green, float blue, int parInt1) {
 		int i = this.getColorIndex(parInt1);
-		int j = MathHelper.clamp((int) (red * 255.0F), 0, 255);
-		int k = MathHelper.clamp((int) (green * 255.0F), 0, 255);
-		int l = MathHelper.clamp((int) (blue * 255.0F), 0, 255);
+		int j = Mth.clamp((int) (red * 255.0F), 0, 255);
+		int k = Mth.clamp((int) (green * 255.0F), 0, 255);
+		int l = Mth.clamp((int) (blue * 255.0F), 0, 255);
 		this.putColorRGBA(i, j, k, l, 255);
 	}
 

@@ -17,10 +17,14 @@ public final class User {
 	static {
 		(creativeTiles = new ArrayList()).add(Tile.rock);
 		creativeTiles.add(Tile.stoneBrick);
+		creativeTiles.add(Tile.brick);
 		creativeTiles.add(Tile.dirt);
 		creativeTiles.add(Tile.wood);
 		creativeTiles.add(Tile.log);
 		creativeTiles.add(Tile.leaf);
+		creativeTiles.add(Tile.glass);
+		creativeTiles.add(Tile.slabHalf);
+		creativeTiles.add(Tile.mossStone);
 		creativeTiles.add(Tile.bush);
 		creativeTiles.add(Tile.flower);
 		creativeTiles.add(Tile.rose);
@@ -28,9 +32,7 @@ public final class User {
 		creativeTiles.add(Tile.mushroom2);
 		creativeTiles.add(Tile.sand);
 		creativeTiles.add(Tile.gravel);
-		creativeTiles.add(Tile.glass);
 		creativeTiles.add(Tile.sponge);
-		creativeTiles.add(Tile.goldBlock);
 		creativeTiles.add(Tile.clothRed);
 		creativeTiles.add(Tile.clothOrange);
 		creativeTiles.add(Tile.clothYellow);
@@ -47,5 +49,13 @@ public final class User {
 		creativeTiles.add(Tile.clothDarkGray);
 		creativeTiles.add(Tile.clothGray);
 		creativeTiles.add(Tile.clothWhite);
+		creativeTiles.add(Tile.coalOre);
+		creativeTiles.add(Tile.ironOre);
+		creativeTiles.add(Tile.goldOre);
+		creativeTiles.add(Tile.iron);
+		creativeTiles.add(Tile.gold);
+		creativeTiles.add(Tile.bookshelf);
+		creativeTiles.add(Tile.tnt);
+		creativeTiles.add(Tile.obsidian);
 	}
 }

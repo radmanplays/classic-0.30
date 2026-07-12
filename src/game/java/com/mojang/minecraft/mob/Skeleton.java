@@ -12,6 +12,7 @@ public class Skeleton extends Zombie {
 		this.modelName = "skeleton";
 		this.textureName = "/mob/skeleton.png";
 		BasicAttackAI var5 = new BasicAttackAI() {
+			public static final long serialVersionUID = 0L;
 			public final void tick(Level var1, Mob var2) {
 				super.tick(var1, var2);
 				if(var2.health > 0 && this.random.nextInt(30) == 0 && this.attackTarget != null) {
@@ -24,6 +25,7 @@ public class Skeleton extends Zombie {
 				Skeleton.access$000(Skeleton.this);
 			}
 		};
+		this.deathScore = 120;
 		var5.runSpeed = 0.3F;
 		var5.damage = 8;
 		this.ai = var5;

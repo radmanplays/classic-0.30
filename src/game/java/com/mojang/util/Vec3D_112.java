@@ -1,6 +1,6 @@
 package com.mojang.util;
 
-import com.mojang.util.MathHelper;
+import com.mojang.util.Mth;
 
 public class Vec3D_112 {
 	public static final Vec3D_112 ZERO = new Vec3D_112(0.0D, 0.0D, 0.0D);
@@ -43,7 +43,7 @@ public class Vec3D_112 {
 	 * Normalizes the vector to a length of 1 (except if it is the zero vector)
 	 */
 	public Vec3D_112 normalize() {
-		double d0 = (double) MathHelper
+		double d0 = (double) Mth
 				.sqrt_double(this.xCoord * this.xCoord + this.yCoord * this.yCoord + this.zCoord * this.zCoord);
 		return d0 < 1.0E-4D ? ZERO : new Vec3D_112(this.xCoord / d0, this.yCoord / d0, this.zCoord / d0);
 	}
@@ -88,7 +88,7 @@ public class Vec3D_112 {
 		double d0 = vec.xCoord - this.xCoord;
 		double d1 = vec.yCoord - this.yCoord;
 		double d2 = vec.zCoord - this.zCoord;
-		return (double) MathHelper.sqrt_double(d0 * d0 + d1 * d1 + d2 * d2);
+		return (double) Mth.sqrt_double(d0 * d0 + d1 * d1 + d2 * d2);
 	}
 
 	/**
@@ -116,7 +116,7 @@ public class Vec3D_112 {
 	 * Returns the length of the vector.
 	 */
 	public double lengthVector() {
-		return (double) MathHelper
+		return (double) Mth
 				.sqrt_double(this.xCoord * this.xCoord + this.yCoord * this.yCoord + this.zCoord * this.zCoord);
 	}
 
@@ -214,8 +214,8 @@ public class Vec3D_112 {
 	}
 
 	public Vec3D_112 rotatePitch(float pitch) {
-		float f = MathHelper.cos(pitch);
-		float f1 = MathHelper.sin(pitch);
+		float f = Mth.cos(pitch);
+		float f1 = Mth.sin(pitch);
 		double d0 = this.xCoord;
 		double d1 = this.yCoord * (double) f + this.zCoord * (double) f1;
 		double d2 = this.zCoord * (double) f - this.yCoord * (double) f1;
@@ -223,8 +223,8 @@ public class Vec3D_112 {
 	}
 
 	public Vec3D_112 rotateYaw(float yaw) {
-		float f = MathHelper.cos(yaw);
-		float f1 = MathHelper.sin(yaw);
+		float f = Mth.cos(yaw);
+		float f1 = Mth.sin(yaw);
 		double d0 = this.xCoord * (double) f + this.zCoord * (double) f1;
 		double d1 = this.yCoord;
 		double d2 = this.zCoord * (double) f - this.xCoord * (double) f1;
@@ -235,10 +235,10 @@ public class Vec3D_112 {
 	 * returns a Vec3d from given pitch and yaw degrees
 	 */
 	public static Vec3D_112 fromPitchYaw(float p_189986_0_, float p_189986_1_) {
-		float f = MathHelper.cos(-p_189986_1_ * 0.017453292F - (float) Math.PI);
-		float f1 = MathHelper.sin(-p_189986_1_ * 0.017453292F - (float) Math.PI);
-		float f2 = -MathHelper.cos(-p_189986_0_ * 0.017453292F);
-		float f3 = MathHelper.sin(-p_189986_0_ * 0.017453292F);
+		float f = Mth.cos(-p_189986_1_ * 0.017453292F - (float) Math.PI);
+		float f1 = Mth.sin(-p_189986_1_ * 0.017453292F - (float) Math.PI);
+		float f2 = -Mth.cos(-p_189986_0_ * 0.017453292F);
+		float f3 = Mth.sin(-p_189986_0_ * 0.017453292F);
 		return new Vec3D_112((double) (f1 * f2), (double) f3, (double) (f * f2));
 	}
 }
