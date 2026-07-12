@@ -1020,6 +1020,7 @@ public final class Minecraft implements Runnable {
 	public final void pauseScreen() {
 		if(this.screen == null && (!(this.screen instanceof PauseScreen))) {
 			this.setScreen(new PauseScreen());
+			LevelIO.save(this.level, new VFile2("level.dat"));
 		}
 	}
 	
