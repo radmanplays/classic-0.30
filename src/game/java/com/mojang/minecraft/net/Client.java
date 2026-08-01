@@ -75,7 +75,7 @@ public final class Client {
         if (this.serverConnection.webSocket != null
                 && this.serverConnection.webSocket.getState() == EnumEaglerConnectionState.CONNECTED
                 && !loginSent) {
-        	this.serverConnection.sendPacket(Packet.LOGIN, new Object[]{Byte.valueOf((byte)6), this.minecraft.user.name, "", Integer.valueOf(0)});
+        	this.serverConnection.sendPacket(Packet.LOGIN, new Object[]{Byte.valueOf((byte)7), this.minecraft.user.name, "", Integer.valueOf(0)});
         	loginSent = true;
         }
     }
