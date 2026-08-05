@@ -1688,7 +1688,12 @@ public final class Minecraft implements Runnable {
 				}
 			}
 		}
-		this.player = (Player) var1.getPlayer();
+		
+		if (var1 != null) {
+			this.player = (Player) var1.getPlayer();
+		} else {
+			this.player = null;
+		}
 		if(this.player == null) {
 			this.player = new Player(var1);
 			this.player.resetPos();
