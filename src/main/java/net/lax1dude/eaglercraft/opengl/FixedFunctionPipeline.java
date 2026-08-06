@@ -75,8 +75,8 @@ public class FixedFunctionPipeline {
 
 		EaglercraftGPU.bindGLVertexArray(self.getDirectModeVertexArray());
 		int off = StreamBuffer.uploadData(self.attribStride, buffer.remaining() / self.attribStride, quads);
-		_wglBufferSubData(GL_ARRAY_BUFFER, off * self.attribStride, buffer);
-		self.directBaseOffset = off;
+		_wglBufferData(GL_ARRAY_BUFFER, buffer, GL_STATIC_DRAW);
+		self.directBaseOffset = 0;
 
 		return self;
 	}
