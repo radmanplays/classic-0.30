@@ -1,13 +1,19 @@
-# Classic 0.30 Creative and Survival [![Build and Upload JS + WASM](https://github.com/radmanplays/classic-0.25_05/actions/workflows/gradle.yml/badge.svg)](https://github.com/radmanplays/classic-0.25_05/actions/workflows/gradle.yml)
+# Classic 0.30 Creative and Survival [![Build and Upload JS + WASM](https://github.com/radmanplays/classic-0.30/actions/workflows/gradle.yml/badge.svg)](https://github.com/radmanplays/classic-0.30/actions/workflows/gradle.yml)
 #### port of classic-0.30 to browser using teavm
 
-## Creative
+## [Creative](https://radmanplays.github.io/classic-0.30/?creative)
 <img width="858" height="477" alt="image" src="https://github.com/user-attachments/assets/c93f055a-850a-4b37-a94c-8f1af7d7d361" />
 
-# Survival
+# [Survival](https://radmanplays.github.io/classic-0.30/)
 <img width="858" height="477" alt="image" src="https://github.com/user-attachments/assets/7492a384-85ae-4420-90c3-11a46f4c2eb0" />
 
+### Available params
+- `creative:` sets the player's gamemode to creative(in singleplayer)
+- `server:` joins a server when a client loads
+- `username:` sets the player's username used in multiplayer
 
+these params can be used like this:
+`https://radmanplays.github.io/classic-0.30/?creative=true&server=wss://classic.webmc.xyz&username=yourusername`
 
 ## requires java 17 to compile!
 ### (versions newer or older than 17 wont work)
