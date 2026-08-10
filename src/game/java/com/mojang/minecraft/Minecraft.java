@@ -66,12 +66,14 @@ import com.mojang.util.Mth;
 
 import net.lax1dude.eaglercraft.EagRuntime;
 import net.lax1dude.eaglercraft.EagUtils;
+import net.lax1dude.eaglercraft.HString;
 import net.lax1dude.eaglercraft.internal.EnumPlatformType;
 import net.lax1dude.eaglercraft.internal.IWebSocketFrame;
 import net.lax1dude.eaglercraft.internal.buffer.ByteBuffer;
 import net.lax1dude.eaglercraft.internal.buffer.FloatBuffer;
 import net.lax1dude.eaglercraft.internal.buffer.IntBuffer;
 import net.lax1dude.eaglercraft.internal.vfs2.VFile2;
+import net.lax1dude.eaglercraft.Random;
 
 public final class Minecraft implements Runnable {
 	public GameMode gamemode = new SurvivalGameMode(this);
@@ -232,6 +234,16 @@ public final class Minecraft implements Runnable {
 			Item.initModels();
 			Mob.modelCache = new ModelCache();
 			GL11.glViewport(0, 0, this.width, this.height);
+			if(this.user == null) {
+				String[] defaultNames = new String[] {
+						"Yeeish", "Yeeish", "Yee", "Yee", "Yeer", "Yeeler", "Eagler", "Eagl",
+						"Darver", "Darvler", "Vool", "Vigg", "Vigg", "Deev", "Yigg", "Yeeg"
+				};
+				
+				Random rand = new Random();
+				this.user = new User(HString.format("%s%s%04d", defaultNames[rand.nextInt(defaultNames.length)], defaultNames[rand.nextInt(defaultNames.length)], rand.nextInt(10000)), "");
+			}
+			
 			if(this.server != null && this.user != null) {
 				this.gamemode = new CreativeGameMode(this);
 				Level var62 = new Level();
