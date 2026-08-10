@@ -30,6 +30,9 @@ public abstract class JSEaglercraftXOptsRoot implements JSObject {
 	@JSBody(params = { "def" }, script = "return (typeof this.joinServer === \"string\") ? this.joinServer : def;")
 	public native String getJoinServer(String defaultValue);
 
+	@JSBody(params = { "def" }, script = "return (typeof this.creative=== \"boolean\") ? this.creative : def;")
+	public native boolean getcreative(boolean defaultValue);
+
 	@JSBody(script = "return (typeof this.assetsURI === \"string\") ? this.assetsURI : null;")
 	public native String getAssetsURI();
 

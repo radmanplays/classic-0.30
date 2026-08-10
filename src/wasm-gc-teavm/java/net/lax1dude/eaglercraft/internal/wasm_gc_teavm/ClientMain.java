@@ -31,6 +31,7 @@ import net.lax1dude.eaglercraft.socket.AddressResolver.ServerInfo;
 
 import com.mojang.minecraft.Minecraft;
 import com.mojang.minecraft.User;
+import com.mojang.minecraft.gamemode.CreativeGameMode;
 import net.lax1dude.eaglercraft.EagRuntime;
 
 public class ClientMain {
@@ -103,6 +104,11 @@ public class ClientMain {
 					ServerInfo serverInfo = AddressResolver.resolveURI(server);
 					minecraft.setServer(serverInfo.ip);
 					systemOut.println("Connecting to server " + serverInfo.ip);
+				}
+
+				Boolean creative = eaglercraftOpts.getcreative(false);
+				if(creative != false || ((username != null && !username.isEmpty()) && (server != null && !server.isEmpty()))) {
+					minecraft.gamemode = new CreativeGameMode(minecraft);
 				}
 
 				(new Thread(minecraft)).run();

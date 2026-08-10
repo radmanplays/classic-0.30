@@ -30,6 +30,9 @@ public interface JSEaglercraftXOptsRoot extends JSObject {
 	@JSBody(params = { "def" }, script = "return (typeof this.joinServer === \"string\") ? this.joinServer : def;")
 	String getJoinServer(String defaultValue);
 
+	@JSBody(params = { "def" }, script = "return (typeof this.creative=== \"boolean\") ? this.creative : def;")
+	boolean getcreative(boolean defaultValue);
+
 	@JSBody(params = { "def" }, script = "return (typeof this.localesURI === \"string\") ? this.localesURI : def;")
 	String getLocalesURI(String defaultValue);
 
