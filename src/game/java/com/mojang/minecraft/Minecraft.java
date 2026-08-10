@@ -174,7 +174,9 @@ public final class Minecraft implements Runnable {
 		Minecraft var5 = this;
 		try {
 			if(this.networkClient == null && var5.level != null) {
-				LevelIO.save(var5.level, new VFile2("level.dat"));
+				if(server == null) {
+					LevelIO.save(var5.level, new VFile2("level.dat"));
+				}
 			}
 		} catch (Exception var2) {
 			var2.printStackTrace();
@@ -1031,7 +1033,9 @@ public final class Minecraft implements Runnable {
 	public final void pauseScreen() {
 		if(this.screen == null && (!(this.screen instanceof PauseScreen))) {
 			this.setScreen(new PauseScreen());
-			LevelIO.save(this.level, new VFile2("level.dat"));
+			if(server == null) {
+				LevelIO.save(this.level, new VFile2("level.dat"));
+			}
 		}
 	}
 	
@@ -1042,7 +1046,9 @@ public final class Minecraft implements Runnable {
 
 	    saveCountdown--;
 	    if (saveCountdown <= 0) {
-	    	LevelIO.save(this.level, new VFile2("level.dat"));
+	    	if(server == null) {
+	    		LevelIO.save(this.level, new VFile2("level.dat"));
+	    	}
 	        saveCountdown = 600;
 	    }
 	}
