@@ -44,9 +44,11 @@
 						const params = new URLSearchParams(window.location.search);
 						const server = params.get("server");
 						const username = params.get("username");
+						const creative = params.get("creative");
 
 						if (server) window.eaglercraftXOpts.joinServer = server;
 						if (username) window.eaglercraftXOpts.username = username;
+						if (creative) window.eaglercraftXOpts.creative = (creative === "true" || creative === "");
 					}
 
 					
