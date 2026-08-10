@@ -65,6 +65,7 @@ import com.mojang.util.GLAllocation;
 import com.mojang.util.Mth;
 
 import net.lax1dude.eaglercraft.EagRuntime;
+import net.lax1dude.eaglercraft.EagUtils;
 import net.lax1dude.eaglercraft.internal.EnumPlatformType;
 import net.lax1dude.eaglercraft.internal.IWebSocketFrame;
 import net.lax1dude.eaglercraft.internal.buffer.ByteBuffer;
@@ -230,6 +231,7 @@ public final class Minecraft implements Runnable {
 			Mob.modelCache = new ModelCache();
 			GL11.glViewport(0, 0, this.width, this.height);
 			if(this.server != null && this.user != null) {
+				this.gamemode = new CreativeGameMode(this);
 				Level var62 = new Level();
 				var62.setData(8, 8, 8, new byte[512]);
 				this.loadLegacy(var62);
@@ -980,13 +982,13 @@ public final class Minecraft implements Runnable {
 									var54.minecraft.screen.render(var72, var71);
 								}
 
-								Thread.yield();
+								EagRuntime.immediateContinue();
 								Display.update();
 							}
 						}
 
 						if(this.options.limitFramerate) {
-							Thread.sleep(5L);
+							EagUtils.sleep(5L);
 						}
 
 						checkGlError("Post render");
@@ -1688,7 +1690,12 @@ public final class Minecraft implements Runnable {
 				}
 			}
 		}
-		this.player = (Player) var1.getPlayer();
+		
+		if (var1 != null) {
+			this.player = (Player) var1.getPlayer();
+		} else {
+			this.player = null;
+		}
 		if(this.player == null) {
 			this.player = new Player(var1);
 			this.player.resetPos();
