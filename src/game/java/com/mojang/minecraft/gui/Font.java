@@ -77,49 +77,52 @@ public final class Font {
 			GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.fontTexture);
 			Tesselator var6 = Tesselator.instance;
 			var6.begin();
-			var6.color(var4);
-			int var7 = 0;
+			try {
+				var6.color(var4);
+				int var7 = 0;
 
-			for(int var8 = 0; var8 < var12.length; ++var8) {
-				int var9;
-				if(var12[var8] == 38 && var12.length > var8 + 1) {
-					var4 = "0123456789abcdef".indexOf(var12[var8 + 1]);
-					if(var4 < 0) {
-						var4 = 15;
+				for(int var8 = 0; var8 < var12.length; ++var8) {
+					int var9;
+					if(var12[var8] == 38 && var12.length > var8 + 1) {
+						var4 = "0123456789abcdef".indexOf(var12[var8 + 1]);
+						if(var4 < 0) {
+							var4 = 15;
+						}
+
+						var9 = (var4 & 8) << 3;
+						int var10 = (var4 & 1) * 191 + var9;
+						int var11 = ((var4 & 2) >> 1) * 191 + var9;
+						var4 = ((var4 & 4) >> 2) * 191 + var9;
+						if(this.options.anaglyph3d) {
+							var9 = (var4 * 30 + var11 * 59 + var10 * 11) / 100;
+							var11 = (var4 * 30 + var11 * 70) / 100;
+							var10 = (var4 * 30 + var10 * 70) / 100;
+							var4 = var9;
+							var11 = var11;
+							var10 = var10;
+						}
+						var4 = var4 << 16 | var11 << 8 | var10;
+						if(var5) {
+							var4 = (var4 & 16579836) >> 2;
+						}
+
+						var6.color(var4);
+						++var8;
+						continue;
 					}
 
-					var9 = (var4 & 8) << 3;
-					int var10 = (var4 & 1) * 191 + var9;
-					int var11 = ((var4 & 2) >> 1) * 191 + var9;
-					var4 = ((var4 & 4) >> 2) * 191 + var9;
-					if(this.options.anaglyph3d) {
-						var9 = (var4 * 30 + var11 * 59 + var10 * 11) / 100;
-						var11 = (var4 * 30 + var11 * 70) / 100;
-						var10 = (var4 * 30 + var10 * 70) / 100;
-						var4 = var9;
-						var11 = var11;
-						var10 = var10;
-					}
-					var4 = var4 << 16 | var11 << 8 | var10;
-					var8 += 2;
-					if(var5) {
-						var4 = (var4 & 16579836) >> 2;
-					}
-
-					var6.color(var4);
+					var4 = var12[var8] % 16 << 3;
+					var9 = var12[var8] / 16 << 3;
+					float var13 = 7.99F;
+					var6.vertexUV((float)(var2 + var7), (float)var3 + var13, 0.0F, (float)var4 / 128.0F, ((float)var9 + var13) / 128.0F);
+					var6.vertexUV((float)(var2 + var7) + var13, (float)var3 + var13, 0.0F, ((float)var4 + var13) / 128.0F, ((float)var9 + var13) / 128.0F);
+					var6.vertexUV((float)(var2 + var7) + var13, (float)var3, 0.0F, ((float)var4 + var13) / 128.0F, (float)var9 / 128.0F);
+					var6.vertexUV((float)(var2 + var7), (float)var3, 0.0F, (float)var4 / 128.0F, (float)var9 / 128.0F);
+					var7 += this.charWidths[var12[var8]];
 				}
-
-				var4 = var12[var8] % 16 << 3;
-				var9 = var12[var8] / 16 << 3;
-				float var13 = 7.99F;
-				var6.vertexUV((float)(var2 + var7), (float)var3 + var13, 0.0F, (float)var4 / 128.0F, ((float)var9 + var13) / 128.0F);
-				var6.vertexUV((float)(var2 + var7) + var13, (float)var3 + var13, 0.0F, ((float)var4 + var13) / 128.0F, ((float)var9 + var13) / 128.0F);
-				var6.vertexUV((float)(var2 + var7) + var13, (float)var3, 0.0F, ((float)var4 + var13) / 128.0F, (float)var9 / 128.0F);
-				var6.vertexUV((float)(var2 + var7), (float)var3, 0.0F, (float)var4 / 128.0F, (float)var9 / 128.0F);
-				var7 += this.charWidths[var12[var8]];
+			} finally {
+				var6.end();
 			}
-
-			var6.end();
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			GL11.glDisable(GL11.GL_BLEND);
 		}

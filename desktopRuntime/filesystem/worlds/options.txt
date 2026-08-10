@@ -1,11 +1,11 @@
-music:true
-sound:true
-invertYMouse:true
+music:false
+sound:false
+invertYMouse:false
 showFrameRate:true
 viewDistance:0
 bobView:true
 anaglyph3d:false
-limitFramerate:false
+limitFramerate:true
 key_Forward:200
 key_Left:203
 key_Back:208

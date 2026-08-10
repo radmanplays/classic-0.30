@@ -22,7 +22,7 @@ public final class Options {
 	public int viewDistance = 0;
 	public boolean bobView = true;
 	public boolean anaglyph3d = false;
-	public boolean limitFramerate = false;
+	public boolean limitFramerate = true;
 	public KeyMapping forward = new KeyMapping("Forward", 17);
 	public KeyMapping left = new KeyMapping("Left", 30);
 	public KeyMapping back = new KeyMapping("Back", 31);

@@ -982,13 +982,14 @@ public final class Minecraft implements Runnable {
 									var54.minecraft.screen.render(var72, var71);
 								}
 
-								EagRuntime.immediateContinue();
 								Display.update();
 							}
 						}
 
 						if(this.options.limitFramerate) {
-							EagUtils.sleep(5L);
+							Display.setVSync(true);
+						} else { 
+							Display.setVSync(false);
 						}
 
 						checkGlError("Post render");

@@ -2,6 +2,8 @@ package com.mojang.minecraft.gui;
 
 import com.mojang.minecraft.Options;
 
+import net.lax1dude.eaglercraft.Display;
+
 public final class OptionsScreen extends Screen {
 	private Screen parent;
 	private String title = "Options";
@@ -14,7 +16,11 @@ public final class OptionsScreen extends Screen {
 
 	public final void init() {
 		for(int var1 = 0; var1 < this.options.optionCount; ++var1) {
-			this.buttons.add(new SmallButton(var1, this.width / 2 - 155 + var1 % 2 * 160, this.height / 6 + 24 * (var1 >> 1), this.options.getMessage(var1)));
+			SmallButton btn = new SmallButton(var1, this.width / 2 - 155 + var1 % 2 * 160, this.height / 6 + 24 * (var1 >> 1), this.options.getMessage(var1));
+			this.buttons.add(btn);
+			if (var1 == 7) {
+				btn.enabled = Display.isVSyncSupported();
+			}
 		}
 
 		this.buttons.add(new Button(100, this.width / 2 - 100, this.height / 6 + 120 + 12, "Controls..."));
