@@ -13,7 +13,9 @@
 - `username:` sets the player's username used in multiplayer
 
 these params can be used like this:
-`https://radmanplays.github.io/classic-0.30/?creative=true&server=wss://classic.webmc.xyz&username=yourusername`
+```
+https://radmanplays.github.io/classic-0.30/?creative=true&server=wss://classic.webmc.xyz&username=yourusername
+```
 
 ## requires java 17 to compile!
 ### (versions newer or older than 17 wont work)
