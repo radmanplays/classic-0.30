@@ -235,7 +235,7 @@ public final class Minecraft implements Runnable {
 			if(this.server != null && this.user != null) {
 				this.gamemode = new CreativeGameMode(this);
 				Level var62 = new Level();
-				var62.setData(8, 8, 8, new byte[512]);
+				var62.setData(64, 64, 64, new byte[1032192]);
 				this.loadLegacy(var62);
 			} else {
 				boolean var9 = false;
@@ -983,8 +983,9 @@ public final class Minecraft implements Runnable {
 								if(var54.minecraft.screen != null) {
 									var54.minecraft.screen.render(var72, var71);
 								}
-
-								Display.update();
+								if(!this.hideScreen) {
+									Display.update();
+								}
 							}
 						}
 
@@ -1189,6 +1190,7 @@ public final class Minecraft implements Runnable {
 		int var47;
 		if(this.networkClient != null && !(this.screen instanceof ErrorScreen)) {
 			if(!this.networkClient.isConnected()) {
+				this.hideScreen = true;
 				this.loadingScreen.beginLevelLoading("Connecting..");
 				this.loadingScreen.setLoadingProgress(0);
 			} else {
