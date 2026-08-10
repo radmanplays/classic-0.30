@@ -1,11 +1,11 @@
-# Classic 0.30 [![Build and Upload JS + WASM](https://github.com/radmanplays/classic-0.25_05/actions/workflows/gradle.yml/badge.svg)](https://github.com/radmanplays/classic-0.25_05/actions/workflows/gradle.yml)
-<img width="858" height="477" alt="image" src="https://github.com/user-attachments/assets/9e59ea9b-c88e-4e34-9ada-fe848b06df0b" />
+# Classic 0.30 Creative and Survival [![Build and Upload JS + WASM](https://github.com/radmanplays/classic-0.25_05/actions/workflows/gradle.yml/badge.svg)](https://github.com/radmanplays/classic-0.25_05/actions/workflows/gradle.yml)
+#### port of classic-0.30 to browser using teavm
 
+## Creative
+<img width="858" height="477" alt="image" src="https://github.com/user-attachments/assets/c93f055a-850a-4b37-a94c-8f1af7d7d361" />
 
-
-
-
-
+# Survival
+<img width="858" height="477" alt="image" src="https://github.com/user-attachments/assets/7492a384-85ae-4420-90c3-11a46f4c2eb0" />
 
 
 
