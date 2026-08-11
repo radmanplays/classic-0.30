@@ -995,9 +995,9 @@ public final class Minecraft implements Runnable {
 								if(var54.minecraft.screen != null) {
 									var54.minecraft.screen.render(var72, var71);
 								}
-								if(!this.hideScreen) {
+//								if(!this.hideScreen) {
 									Display.update();
-								}
+//								}
 							}
 						}
 
