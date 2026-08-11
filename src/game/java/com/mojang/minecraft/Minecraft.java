@@ -339,7 +339,7 @@ public final class Minecraft implements Runnable {
 
 						checkGlError("Pre render");
 						GL11.glEnable(GL11.GL_TEXTURE_2D);
-//						if(!this.hideScreen) {
+						if(!this.hideScreen) {
 							if (Display.wasResized()) {
 								if(Display.getHeight() != 0) {
 									this.width = Display.getWidth();
@@ -381,7 +381,7 @@ public final class Minecraft implements Runnable {
 								var54.minecraft.player.turn((float)var61, (float)(var64 * var68));
 							}
 
-//							if(!var54.minecraft.hideScreen) {
+							if(!var54.minecraft.hideScreen) {
 								var61 = var54.minecraft.width * 240 / var54.minecraft.height;
 								var64 = var54.minecraft.height * 240 / var54.minecraft.height;
 								int var72 = Mouse.getX() * var61 / var54.minecraft.width;
@@ -998,8 +998,8 @@ public final class Minecraft implements Runnable {
 								if(!this.hideScreen) {
 									Display.update();
 								}
-//							}
-//						}
+							}
+						}
 
 						if(this.options.limitFramerate) {
 							Display.setVSync(true);
